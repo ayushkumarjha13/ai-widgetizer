@@ -86,8 +86,11 @@ export default async function handler(req, res) {
       botBg: getVal(f.botBubbleColor),
       usrBg: getVal(f.userBubbleColor),
       greetingMessage: getVal(f.greetingMessage),
+      headerSubtitle: getVal(f.headerSubtitle),
       prompts: getVal(f.starterQuestions) || [],
-      showBranding: showBranding
+      showBranding: showBranding,
+      brandingText: getVal(f.brandingText),
+      brandingLink: getVal(f.brandingLink)
     };
 
     return res.status(200).json(config);
