@@ -10,11 +10,18 @@
       
       // Auto-detect base URL from script src
       let baseUrl = '';
-      const script = document.currentScript || Array.from(document.getElementsByTagName('script')).find(s => s.src.includes('widget.js'));
-      if (script && script.src) {
-        baseUrl = new URL(script.src).origin;
-      } else {
+      const scripts = document.getElementsByTagName('script');
+      for (let i = 0; i < scripts.length; i++) {
+        if (scripts[i].src && scripts[i].src.includes('widget.js')) {
+          baseUrl = new URL(scripts[i].src).origin;
+          break;
+        }
+      }
+      
+      // Final fallback if detection fails
+      if (!baseUrl) {
         baseUrl = window.location.origin;
+        console.warn('ChatWidget: Base URL not detected, falling back to origin.', baseUrl);
       }
 
       try {
