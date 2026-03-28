@@ -110,6 +110,44 @@
         const hr = document.getElementById('rc-hr');
         const inp = document.getElementById('rc-in');
 
+        // Analytics Helpers
+        const getSentiment = (t) => {
+          if (!t) return 'neutral';
+          const h = ['good','great','awesome','thanks','thank','love','happy','help','helpful','perfect','yes','nice','excellent'];
+          const a = ['bad','wrong','error','broken','angry','useless','stupid','no','hate','worst','terrible','problem','issue'];
+          const tl = t.toLowerCase();
+          if (h.some(w => tl.indexOf(w)!==-1)) return 'happy';
+          if (a.some(w => tl.indexOf(w)!==-1)) return 'angry';
+          return 'neutral';
+        };
+
+        const trackEvent = async (type, sentiment) => {
+          const payload = {
+            widgetId,
+            eventType: type,
+            sessionId: sId,
+            sentiment: sentiment || null,
+            country: window._rc_c || 'Unknown'
+          };
+          
+          if (!window._rc_c) {
+            try {
+              const r = await fetch('https://ipapi.co/json/');
+              const j = await r.json();
+              window._rc_c = j.country_name || 'Unknown';
+              payload.country = window._rc_c;
+            } catch(e) {}
+          }
+
+          fetch(`${baseUrl}/api/track`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          }).catch(() => {});
+        };
+
+        trackEvent('open');
+
         const parseMD = (str) => {
           if (!str) return '';
           let html = str;
@@ -144,6 +182,7 @@
           addMessage(clean, false); 
           inp.value = ''; 
           showType();
+          trackEvent('message', getSentiment(clean));
 
           try {
             const r = await fetch(c.hook, {
