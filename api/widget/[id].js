@@ -90,7 +90,8 @@ export default async function handler(req, res) {
       prompts: getVal(f.starterQuestions) || [],
       showBranding: showBranding,
       brandingText: getVal(f.brandingText),
-      brandingLink: getVal(f.brandingLink)
+      brandingLink: getVal(f.brandingLink),
+      autoOpen: getVal(f.autoOpen) || false
     };
 
     return res.status(200).json(config);

@@ -16,7 +16,7 @@ export interface WidgetConfig {
   brandingLink: string;
   logoUrl: string;
   position: 'left' | 'right';
-  autoOpenDelay: number;
+  autoOpen: boolean;
   ownerUid?: string;
   createdAt?: any;
 }
@@ -35,7 +35,7 @@ export const defaultWidget: WidgetConfig = {
   brandingLink: 'https://yourwebsite.com',
   logoUrl: 'https://ui-avatars.com/api/?name=AI&background=6366f1&color=fff',
   position: 'right',
-  autoOpenDelay: 0,
+  autoOpen: false,
 };
 
 /** Wraps a promise with a timeout — prevents Firestore hangs from freezing the UI */

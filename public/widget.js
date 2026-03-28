@@ -66,16 +66,18 @@
           '.rc-hero p{font-size:14px;color:#64748b;line-height:1.5;margin-bottom:24px;font-weight:500}',
           '.rc-btn{display:block;width:100%;background:#fff;border:1px solid #e2e8f0;padding:12px 16px;border-radius:12px;margin-bottom:8px;font-size:13px;font-weight:600;cursor:pointer;text-align:left;transition:.2s;box-shadow:0 2px 4px rgba(0,0,0,.02)}',
           '.rc-btn:hover{border-color:var(--p);color:var(--p);transform:translateY(-1px)}',
-          '.rc-msg-row{display:flex;align-items:flex-end;animation:rcSlideIn .3s ease-out;margin-bottom:4px}',
+          '.rc-msg-row{display:flex;align-items:flex-end;animation:rcSlideIn .3s ease-out;margin-bottom:12px}',
           '@keyframes rcSlideIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}',
           '.rc-row-bot{justify-content:flex-start}',
           '.rc-row-usr{justify-content:flex-end}',
-          '.rc-msg-avatar{width:28px;height:28px;border-radius:8px;margin-right:8px;border:1px solid #eee;background:#fff;object-fit:cover;flex-shrink:0;margin-bottom:2px}',
-          '.rc-msg{max-width:85%;padding:12px 16px;font-size:14px;border-radius:var(--r);line-height:1.6;word-wrap:break-word;overflow-x:auto}',
+          '.rc-msg-avatar{width:32px;height:32px;border-radius:10px;margin-right:10px;border:1px solid #eee;background:#fff;object-fit:cover;flex-shrink:0;margin-bottom:2px}',
+          '.rc-msg{max-width:85%;padding:14px 18px;font-size:14.5px;border-radius:18px;line-height:1.6;word-wrap:break-word;overflow-x:auto;box-shadow:0 2px 4px rgba(0,0,0,0.02)}',
           '.rc-m-bot{background:'+c.botBg+';color:#1F2937;border:1px solid #e2e8f0;border-bottom-left-radius:4px}',
           '.rc-m-usr{background:'+c.usrBg+';color:#ffffff;border-bottom-right-radius:4px}',
           '.rc-msg a{color:var(--p);text-decoration:underline;font-weight:600}',
-          '.rc-msg table{border-collapse:collapse;width:100%;margin:12px 0;font-size:13px;background:rgba(0,0,0,0.02);border-radius:8px;overflow:hidden;border:1px solid #e2e8f0}',
+          '.rc-msg ul{margin:8px 0;padding-left:20px;list-style-type:disc}',
+          '.rc-msg li{margin-bottom:8px;padding-left:4px}',
+          '.rc-msg table{border-collapse:collapse;width:100%;margin:12px 0;font-size:13px;background:rgba(0,0,0,0.02);border-radius:12px;overflow:hidden;border:1px solid #e2e8f0}',
           '.rc-msg th,.rc-msg td{border:1px solid #e2e8f0;padding:8px 12px;text-align:left}',
           '.rc-msg th{background:rgba(0,0,0,0.04);font-weight:700}',
           '.rc-typing{display:flex;gap:4px;padding:14px 18px!important}',
@@ -150,12 +152,32 @@
 
         const parseMD = (str) => {
           if (!str) return '';
-          let html = str;
-          html = html.replace(/\*\*([^\*]+)\*\*/g, '<strong>$1</strong>');
-          html = html.replace(/(?:^|\n|\s)\* /g, '<br/><br/><span style="margin-right:6px;">•</span>');
-          html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank">$1</a>');
-          html = html.replace(/\r?\n/g, '<br/>');
-          return html.replace(/^(<br\/>)+/g, '');
+          let lines = str.split('\n');
+          let html = [];
+          let inList = false;
+
+          for (let line of lines) {
+            let clean = line.trim();
+            if (clean.startsWith('* ') || clean.startsWith('- ')) {
+              if (!inList) {
+                html.push('<ul>');
+                inList = true;
+              }
+              html.push(`<li>${clean.substring(2)}</li>`);
+            } else {
+              if (inList) {
+                html.push('</ul>');
+                inList = false;
+              }
+              if (clean) html.push(`<p>${clean}</p>`);
+            }
+          }
+          if (inList) html.push('</ul>');
+
+          let res = html.join('');
+          res = res.replace(/\*\*([^\*]+)\*\*/g, '<strong>$1</strong>');
+          res = res.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank">$1</a>');
+          return res;
         };
 
         const addMessage = (t, bot) => {
@@ -234,6 +256,13 @@
 
         document.getElementById('rc-go').onclick = () => sendMessage(inp.value);
         inp.onkeydown = (e) => { if (e.key === 'Enter') sendMessage(inp.value); };
+
+        if (c.autoOpen) {
+          setTimeout(() => {
+            win.classList.add('o');
+            inp.focus();
+          }, 500);
+        }
 
       } catch (error) {
         console.error('ChatWidget Error:', error);

@@ -113,17 +113,19 @@ const Builder = () => {
                   )}
                 </div>
 
-                <h4>Behavior</h4>
-                <div className="form-group">
-                  <label>Auto-Open Delay (Seconds)</label>
-                  <input
-                    type="number"
-                    min="0"
-                    className="form-control"
-                    value={config.autoOpenDelay || 0}
-                    onChange={e => updateConfig('autoOpenDelay', parseInt(e.target.value) || 0)}
-                  />
-                  <p style={{ margin: 0, fontSize: '0.75rem', color: 'var(--text-muted)' }}>Delay before the chat window opens automatically.</p>
+                <div className="form-group" style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: '1rem' }}>
+                  <div>
+                    <h4 style={{ margin: 0 }}>Open Automatically</h4>
+                    <p style={{ margin: 0, fontSize: '0.75rem', color: 'var(--text-muted)' }}>Show chat window instantly on page load</p>
+                  </div>
+                  <label className="toggle-switch">
+                    <input
+                      type="checkbox"
+                      checked={config.autoOpen === true}
+                      onChange={e => updateConfig('autoOpen', e.target.checked)}
+                    />
+                    <span className="toggle-slider" />
+                  </label>
                 </div>
               </div>
             )}
@@ -271,6 +273,21 @@ const Builder = () => {
                       </div>
                     </div>
                   )}
+
+                  <div className="form-group" style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingTop: '1.5rem', marginTop: '1.5rem', borderTop: '1px solid var(--border-color)' }}>
+                    <div>
+                      <h4 style={{ margin: 0 }}>Open Automatically</h4>
+                      <p style={{ margin: 0, fontSize: '0.75rem', color: 'var(--text-muted)' }}>Automatically pop the chat window open on page load</p>
+                    </div>
+                    <label className="toggle-switch">
+                      <input
+                        type="checkbox"
+                        checked={config.autoOpen === true}
+                        onChange={e => updateConfig('autoOpen', e.target.checked)}
+                      />
+                      <span className="toggle-slider" />
+                    </label>
+                  </div>
                 </div>
               </div>
             )}
