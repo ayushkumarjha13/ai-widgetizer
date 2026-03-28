@@ -4,6 +4,7 @@ import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Builder from './pages/Builder';
 import Analytics from './pages/Analytics';
+import Pricing from './pages/Pricing';
 import { useAuthStore } from './store/authStore';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from './lib/firebase';
@@ -39,6 +40,7 @@ function App() {
         <Route path="/builder" element={<PrivateRoute><Builder /></PrivateRoute>} />
         <Route path="/builder/:widgetId" element={<PrivateRoute><Builder /></PrivateRoute>} />
         <Route path="/analytics" element={<PrivateRoute><Analytics /></PrivateRoute>} />
+        <Route path="/pricing" element={<PrivateRoute><Pricing /></PrivateRoute>} />
         <Route path="*" element={<Navigate to="/dashboard" />} />
       </Routes>
     </Router>

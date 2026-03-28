@@ -15,15 +15,44 @@ import type { WidgetConfig } from '../store/widgetStore';
 
 // ─── Users ────────────────────────────────────────────────────────────────────
 
-/** Initialize or update a user profile in Firestore */
+/** Initialize or update a user profile in Firestore and ensure they have a default widget */
 export const syncUserDoc = async (uid: string, email: string) => {
   const userRef = doc(db, 'users', uid);
   await setDoc(userRef, {
     uid,
     email,
-    plan: 'starter', // Default plan
+    plan: 'starter',
     updatedAt: serverTimestamp(),
   }, { merge: true });
+
+  // For production: Ensure new users always have a sample widget
+  const widgetsQuery = query(collection(db, 'widgets'), where('ownerUid', '==', uid));
+  const snap = await getDocs(widgetsQuery);
+  
+  if (snap.empty) {
+    const welcomeId = crypto.randomUUID();
+    const welcomeWidget = {
+      id: welcomeId,
+      name: 'My First AI Agent',
+      n8nWebhookUrl: 'https://primary-n8n-url.com/webhook/example', // Placeholder
+      primaryColor: '#6366f1',
+      botBubbleColor: '#ffffff',
+      userBubbleColor: '#6366f1',
+      greetingMessage: 'Hi! I am your new AI assistant. How can I help you today?',
+      headerSubtitle: 'Ready to help',
+      starterQuestions: ['Tell me about your services', 'How do I get started?'],
+      showBranding: true,
+      brandingText: 'Powered by ChatWatch',
+      brandingLink: 'https://yourwebsite.com',
+      logoUrl: 'https://ui-avatars.com/api/?name=CW&background=6366f1&color=fff',
+      position: 'right',
+      autoOpenDelay: 0,
+      ownerUid: uid,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp()
+    };
+    await setDoc(doc(db, 'widgets', welcomeId), welcomeWidget);
+  }
 };
 
 // ─── Widgets ──────────────────────────────────────────────────────────────────

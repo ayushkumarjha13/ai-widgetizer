@@ -265,6 +265,11 @@ const Login = () => {
               <span>ChatWatch</span>
             </div>
             <p style={{ opacity: 0.5, maxWidth: '240px', fontSize: '0.9rem' }}>The #1 Analytics & Monitoring platform for n8n AI Chatbots.</p>
+            <div style={{ marginTop: '1.5rem', display: 'flex', gap: '1rem' }}>
+              <a href="https://www.linkedin.com/in/ayushkumar1309/" target="_blank" style={{ color: '#fff', opacity: 0.6 }}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+              </a>
+            </div>
           </div>
           <div style={{ display: 'flex', gap: '4rem' }}>
             <FooterCol title="Product" links={['Features', 'Pricing', 'Integrations']} />
@@ -273,7 +278,7 @@ const Login = () => {
           </div>
         </div>
         <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', marginTop: '4rem', paddingTop: '2rem', textAlign: 'center', opacity: 0.4, fontSize: '0.8rem' }}>
-          © 2024 ChatWatch. All rights reserved.
+          © 2026 ChatWatch. Built for n8n by <a href="https://www.linkedin.com/in/ayushkumar1309/" style={{ color: 'inherit', textDecoration: 'underline' }}>Ayush Kumar</a>
         </div>
       </footer>
     </div>

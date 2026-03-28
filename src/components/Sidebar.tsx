@@ -26,6 +26,7 @@ const Sidebar = ({ mobileOpen = false, onMobileClose }: SidebarProps) => {
     { label: 'My Widgets', icon: <LayoutDashboard size={20} />, path: '/dashboard' },
     { label: 'Create Widget', icon: <PlusCircle size={20} />, path: '/builder' },
     { label: 'Analytics', icon: <BarChart2 size={20} />, path: '/analytics' },
+    { label: 'Subscription', icon: <Shield size={20} />, path: '/pricing' },
   ];
 
   return (
@@ -58,20 +59,6 @@ const Sidebar = ({ mobileOpen = false, onMobileClose }: SidebarProps) => {
           ))}
         </div>
 
-        <div style={{ marginTop: 'auto', padding: '1.25rem', background: 'rgba(0,0,0,0.03)', borderRadius: '12px', border: '1px solid var(--border-color)', margin: '1rem' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-            <Shield size={16} color="var(--primary-color)" />
-            <span style={{ fontWeight: 700, fontSize: '0.8rem' }}>STARTER PLAN</span>
-          </div>
-          <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '12px' }}>Upgrade for Unlimited Widgets & CSV Export.</p>
-          <button 
-            onClick={() => alert('Redirecting to Payment...')}
-            className="btn btn-primary" 
-            style={{ padding: '6px 12px', fontSize: '0.75rem', width: '100%', borderRadius: '8px' }}
-          >
-            Upgrade Now
-          </button>
-        </div>
 
         <div className="nav-item logout-btn" onClick={handleLogout} style={{ borderTop: '1px solid var(--border-color)', borderRadius: 0 }}>
           <LogOut size={20} />
