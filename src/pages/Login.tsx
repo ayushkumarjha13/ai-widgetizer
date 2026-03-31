@@ -5,7 +5,7 @@ import {
   Star
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signInWithPopup, getAdditionalUserInfo } from 'firebase/auth';
 import { auth, googleProvider } from '../lib/firebase';
 import { useAuthStore } from '../store/authStore';
 import { syncUserDoc } from '../lib/firestoreService';
@@ -26,14 +26,25 @@ const Login = () => {
     setLoading(true);
     try {
       let user;
+      let isNewUser = false;
       if (isSignUp) {
         const res = await createUserWithEmailAndPassword(auth, email, password);
         user = res.user;
+        isNewUser = true;
       } else {
         const res = await signInWithEmailAndPassword(auth, email, password);
         user = res.user;
       }
-      if (user) await syncUserDoc(user.uid, user.email!);
+      if (user) {
+        await syncUserDoc(user.uid, user.email!);
+        if (isNewUser) {
+          fetch('https://n8n.srv976794.hstgr.cloud/webhook/user-signup', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: user.email, uid: user.uid })
+          }).catch(err => console.error('n8n error:', err));
+        }
+      }
       navigate('/dashboard');
     } catch (err: any) {
       if (err.code === 'auth/api-key-not-valid' || auth.app.options.apiKey?.includes('DummyKey')) {
@@ -53,7 +64,17 @@ const Login = () => {
     try {
       if (auth.app.options.apiKey?.includes('DummyKey')) throw new Error('dummy-key');
       const res = await signInWithPopup(auth, googleProvider);
-      if (res.user) await syncUserDoc(res.user.uid, res.user.email!);
+      const additionalInfo = getAdditionalUserInfo(res);
+      if (res.user) {
+        await syncUserDoc(res.user.uid, res.user.email!);
+        if (additionalInfo?.isNewUser) {
+          fetch('https://n8n.srv976794.hstgr.cloud/webhook/user-signup', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: res.user.email, uid: res.user.uid })
+          }).catch(err => console.error('n8n error:', err));
+        }
+      }
       navigate('/dashboard');
     } catch (err: any) {
       const googleUser = { uid: 'dev-mode-google', email: 'google.user@local.host' };
@@ -79,18 +100,18 @@ const Login = () => {
       </nav>
 
       {/* Hero Section */}
-      <section style={{ padding: '6rem 2rem', textAlign: 'center', maxWidth: '900px', margin: '0 auto' }}>
+      <section style={{ padding: 'clamp(3rem, 10vw, 6rem) 1.5rem', textAlign: 'center', maxWidth: '900px', margin: '0 auto' }}>
         <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '6px 16px', background: '#eef2ff', color: '#6366f1', borderRadius: '100px', fontSize: '0.8rem', fontWeight: 700, marginBottom: '2rem' }}>
           <Star size={14} fill="#6366f1" />
           <span>NOW POWERED BY SENTIMENT AI</span>
         </div>
-        <h1 style={{ fontSize: '4rem', fontWeight: 900, lineHeight: 1.1, marginBottom: '1.5rem', letterSpacing: '-0.02em' }}>
+        <h1 style={{ fontSize: 'clamp(2.5rem, 8vw, 4rem)', fontWeight: 900, lineHeight: 1.1, marginBottom: '1.5rem', letterSpacing: '-0.02em' }}>
           Turn your n8n workflows into <span style={{ color: '#6366f1', display: 'block' }}>Professional AI Chat Widgets</span>
         </h1>
-        <p style={{ fontSize: '1.25rem', color: '#64748b', marginBottom: '2.5rem', lineHeight: 1.6 }}>
+        <p style={{ fontSize: 'clamp(1rem, 4vw, 1.25rem)', color: '#64748b', marginBottom: '2.5rem', lineHeight: 1.6 }}>
           Complete custom branding, advanced analytics, and sentiment analysis for your n8n chatbots. Install in seconds with one line of code.
         </p>
-        <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+        <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
           <button onClick={() => { setIsSignUp(true); setShowAuth(true); }} className="btn btn-primary" style={{ padding: '1rem 2rem', fontSize: '1rem', borderRadius: '12px', boxShadow: '0 10px 15px -3px rgba(99, 102, 241, 0.3)' }}>
             Start Building for Free <ArrowRight size={18} />
           </button>
@@ -103,7 +124,7 @@ const Login = () => {
       {/* Features Grid */}
       <section id="features" style={{ padding: '4rem 2rem', maxWidth: '1100px', margin: '0 auto' }}>
         <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
-          <h2 style={{ fontSize: '2.5rem', fontWeight: 800, marginBottom: '1rem' }}>Everything you need to ship</h2>
+          <h2 style={{ fontSize: 'clamp(2rem, 6vw, 2.5rem)', fontWeight: 800, marginBottom: '1rem' }}>Everything you need to ship</h2>
           <p style={{ color: '#64748b', fontSize: '1.1rem' }}>Native n8n widgets are limited. We give you full control.</p>
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
