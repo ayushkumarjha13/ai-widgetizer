@@ -6,7 +6,7 @@ import { fetchAnalyticsForUser } from '../lib/firestoreService';
 import type { AnalyticsSummary } from '../lib/firestoreService';
 import { 
   BarChart2, Users, MessageSquare, Globe, Clock, 
-  TrendingUp, Zap, Smile, Meh, Frown, Shield, Download 
+  TrendingUp, Zap, Smile, Meh, Frown, Download 
 } from 'lucide-react';
 
 type AllAnalytics = Record<string, AnalyticsSummary>;
@@ -244,31 +244,6 @@ const Analytics = () => {
             </div>
           </div>
 
-          {/* Plan Usage Meter */}
-          <div className="analytics-card" style={{ background: 'linear-gradient(135deg, #1e293b, #0f172a)', color: '#fff' }}>
-            <div className="analytics-card-header" style={{ borderBottomColor: 'rgba(255,255,255,0.1)' }}>
-              <Shield size={18} color="#6366f1" />
-              <h4 style={{ color: '#fff' }}>Plan Usage & Limits</h4>
-            </div>
-            <div style={{ padding: '1.5rem' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem', fontSize: '0.875rem' }}>
-                <span style={{ opacity: 0.8 }}>Monthly Messages</span>
-                <span style={{ fontWeight: 600 }}>{aggData.totalMessages} / 2,000</span>
-              </div>
-              <div className="country-bar-wrap" style={{ height: '8px', background: 'rgba(255,255,255,0.1)' }}>
-                <div 
-                  className="country-bar-fill" 
-                  style={{ 
-                    width: `${Math.min((aggData.totalMessages / 2000) * 100, 100)}%`,
-                    background: aggData.totalMessages > 1800 ? '#ef4444' : '#6366f1'
-                  }} 
-                />
-              </div>
-              <p style={{ margin: '1rem 0 0', fontSize: '0.75rem', opacity: 0.6 }}>
-                You are on the <strong>Pro Plan</strong> ($19/mo). Your message limit resets in 12 days.
-              </p>
-            </div>
-          </div>
 
           {/* Countries */}
           <div className="analytics-card">

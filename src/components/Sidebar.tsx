@@ -1,4 +1,4 @@
-import { LayoutDashboard, PlusCircle, BarChart2, LogOut, X, Shield, Zap } from 'lucide-react';
+import { LayoutDashboard, PlusCircle, BarChart2, LogOut, X, Zap } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 
@@ -25,8 +25,7 @@ const Sidebar = ({ mobileOpen = false, onMobileClose }: SidebarProps) => {
   const menu = [
     { label: 'My Widgets', icon: <LayoutDashboard size={20} />, path: '/dashboard' },
     { label: 'Create Widget', icon: <PlusCircle size={20} />, path: '/builder' },
-    { label: 'Analytics', icon: <BarChart2 size={20} />, path: '/analytics' },
-    { label: 'Subscription', icon: <Shield size={20} />, path: '/pricing' },
+    { label: 'Analytics', icon: <BarChart2 size={20} />, path: '/analytics' }
   ];
 
   return (

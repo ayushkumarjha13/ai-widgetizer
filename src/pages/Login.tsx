@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { 
-  Mail, Lock, ArrowRight, CheckCircle2, 
+  Mail, Lock, ArrowRight, 
   BarChart3, Palette, Zap, Globe, Shield, MessageSquare,
   Star
 } from 'lucide-react';
@@ -74,7 +74,6 @@ const Login = () => {
         </div>
         <div style={{ display: 'flex', gap: '2rem', fontWeight: 600, fontSize: '0.9rem' }}>
           <a href="#features" style={{ color: 'inherit', textDecoration: 'none' }}>Features</a>
-          <a href="#pricing" style={{ color: 'inherit', textDecoration: 'none' }}>Pricing</a>
           <button onClick={() => setShowAuth(true)} style={{ background: 'none', border: 'none', fontWeight: 600, cursor: 'pointer', color: '#6366f1' }}>Login</button>
         </div>
       </nav>
@@ -141,42 +140,6 @@ const Login = () => {
         </div>
       </section>
 
-      {/* Pricing Section */}
-      <section id="pricing" style={{ padding: '8rem 2rem', background: '#f1f5f9' }}>
-        <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
-            <h2 style={{ fontSize: '3rem', fontWeight: 900, marginBottom: '1rem' }}>Transparent Pricing</h2>
-            <p style={{ color: '#64748b', fontSize: '1.1rem' }}>Choose the plan that fits your growth.</p>
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '2rem' }}>
-            <PricingCard 
-              name="Starter"
-              price="$0"
-              desc="Perfect for side projects"
-              features={['1 Widget', '100 Messages/mo', 'Basic Analytics', 'Standard Branding']}
-              cta="Start Free"
-              onCta={() => { setIsSignUp(true); setShowAuth(true); }}
-            />
-            <PricingCard 
-              name="Professional"
-              price="$19"
-              desc="Best for growing businesses"
-              featured
-              features={['3 Widgets', '2,000 Messages/mo', 'Advanced Analytics', 'Sentiment Analysis', 'Custom CSS']}
-              cta="Get Pro"
-              onCta={() => { setIsSignUp(true); setShowAuth(true); }}
-            />
-            <PricingCard 
-              name="Business"
-              price="$49"
-              desc="For high-volume startups"
-              features={['Unlimited Widgets', 'Unlimited Messages', 'CSV Data Export', 'White-labeling', 'Priority Support']}
-              cta="Join Business"
-              onCta={() => { setIsSignUp(true); setShowAuth(true); }}
-            />
-          </div>
-        </div>
-      </section>
 
       {/* Auth Modal Overlay */}
       {showAuth && (
@@ -265,16 +228,17 @@ const Login = () => {
               <span>ChatWatch</span>
             </div>
             <p style={{ opacity: 0.5, maxWidth: '240px', fontSize: '0.9rem' }}>The #1 Analytics & Monitoring platform for n8n AI Chatbots.</p>
-            <div style={{ marginTop: '1.5rem', display: 'flex', gap: '1rem' }}>
+            <div style={{ marginTop: '1.5rem', display: 'flex', gap: '1rem', alignItems: 'center' }}>
               <a href="https://www.linkedin.com/in/ayushkumar1309/" target="_blank" style={{ color: '#fff', opacity: 0.6 }}>
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+              </a>
+              <a href="mailto:ayushjha.in@gmail.com" style={{ color: '#fff', opacity: 0.6 }} title="ayushjha.in@gmail.com">
+                <Mail size={20} />
               </a>
             </div>
           </div>
           <div style={{ display: 'flex', gap: '4rem' }}>
-            <FooterCol title="Product" links={['Features', 'Pricing', 'Integrations']} />
-            <FooterCol title="Support" links={['Documentation', 'Help Center', 'Status']} />
-            <FooterCol title="Legal" links={['Privacy', 'Terms', 'Security']} />
+            <FooterCol title="Product" links={['Features', 'Integrations']} />
           </div>
         </div>
         <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', marginTop: '4rem', paddingTop: '2rem', textAlign: 'center', opacity: 0.4, fontSize: '0.8rem' }}>
@@ -295,39 +259,6 @@ const FeatureCard = ({ icon, title, desc }: { icon: any, title: string, desc: st
   </div>
 );
 
-const PricingCard = ({ name, price, desc, features, cta, featured, onCta }: any) => (
-  <div style={{ 
-    padding: '3rem 2.5rem', 
-    background: featured ? '#fff' : 'rgba(255,255,255,0.6)', 
-    borderRadius: '24px', 
-    border: featured ? '2px solid #6366f1' : '1px solid #e2e8f0',
-    position: 'relative',
-    transform: featured ? 'scale(1.05)' : 'none',
-    zIndex: featured ? 2 : 1,
-    boxShadow: featured ? '0 20px 40px -10px rgba(99,102,241,0.15)' : 'none'
-  }}>
-    {featured && (
-      <div style={{ position: 'absolute', top: '20px', right: '20px', background: '#6366f1', color: '#fff', padding: '4px 12px', borderRadius: '100px', fontSize: '0.7rem', fontWeight: 800 }}>MOST POPULAR</div>
-    )}
-    <h3 style={{ fontSize: '1.5rem', fontWeight: 800, marginBottom: '0.5rem' }}>{name}</h3>
-    <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px', marginBottom: '0.5rem' }}>
-      <span style={{ fontSize: '2.5rem', fontWeight: 900 }}>{price}</span>
-      <span style={{ color: '#64748b', fontWeight: 600 }}>/mo</span>
-    </div>
-    <p style={{ color: '#64748b', fontSize: '0.9rem', marginBottom: '2rem', fontWeight: 500 }}>{desc}</p>
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '2.5rem' }}>
-      {features.map((f: string) => (
-        <div key={f} style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '0.9rem', fontWeight: 600, color: '#334155' }}>
-          <CheckCircle2 size={18} color="#10b981" />
-          <span>{f}</span>
-        </div>
-      ))}
-    </div>
-    <button onClick={onCta} className={featured ? 'btn btn-primary' : 'btn btn-outline'} style={{ width: '100%', padding: '12px', borderRadius: '12px', fontSize: '1rem' }}>
-      {cta}
-    </button>
-  </div>
-);
 
 const FooterCol = ({ title, links }: any) => (
   <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
