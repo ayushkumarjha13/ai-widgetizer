@@ -1,4 +1,4 @@
-import { LayoutDashboard, PlusCircle, BarChart2, LogOut, X, Zap } from 'lucide-react';
+import { LayoutDashboard, PlusCircle, BarChart2, LogOut, X, Zap, ShieldCheck } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 
@@ -10,7 +10,7 @@ interface SidebarProps {
 const Sidebar = ({ mobileOpen = false, onMobileClose }: SidebarProps) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { logout } = useAuthStore();
+  const { user, logout } = useAuthStore();
 
   const handleLogout = async () => {
     await logout();
@@ -27,6 +27,13 @@ const Sidebar = ({ mobileOpen = false, onMobileClose }: SidebarProps) => {
     { label: 'Create Widget', icon: <PlusCircle size={20} />, path: '/builder' },
     { label: 'Analytics', icon: <BarChart2 size={20} />, path: '/analytics' }
   ];
+
+  const ownerEmail = 'ayushjha.in@gmail.com';
+  const isOwner = user?.email === ownerEmail || user?.uid.startsWith('dev-mode');
+
+  if (isOwner) {
+    menu.push({ label: 'Owner Dashboard', icon: <ShieldCheck size={20} />, path: '/admin' });
+  }
 
   return (
     <>

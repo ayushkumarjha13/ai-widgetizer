@@ -197,3 +197,45 @@ export const getUserUsageSummary = async (uid: string) => {
   // Real apps would filter 'analytics' by the current month's timestamp in the query above.
   return { totalMessages, widgetCount };
 };
+
+/** 
+ * ─── Admin SaaS Stats ─────────────────────────────────────────────────────────
+ * Fetches global metrics across the entire platform. 
+ * This is meant for the product owner.
+ */
+export const fetchSaaSStats = async () => {
+  const [usersSnap, widgetsSnap, analyticsSnap] = await Promise.all([
+    getDocs(collection(db, 'users')),
+    getDocs(collection(db, 'widgets')),
+    getDocs(collection(db, 'analytics'))
+  ]);
+
+  const totalUsers = usersSnap.size;
+  const totalWidgets = widgetsSnap.size;
+  const events = analyticsSnap.docs.map(d => d.data() as WidgetEvent);
+
+  const totalMessages = events.filter(e => e.eventType === 'message').length;
+  const totalOpens = events.filter(e => e.eventType === 'open').length;
+
+  // Active Users (those who created at least one widget)
+  const uniqueOwners = new Set(widgetsSnap.docs.map(d => d.data().ownerUid));
+  const activeMakers = uniqueOwners.size;
+
+  // Usage by day (Global)
+  const usageByDay: Record<string, number> = {};
+  events.forEach(ev => {
+    if (ev.ts) {
+      const day = (ev.ts as Timestamp).toDate().toISOString().slice(0, 10);
+      usageByDay[day] = (usageByDay[day] || 0) + 1;
+    }
+  });
+
+  return {
+    totalUsers,
+    totalWidgets,
+    totalMessages,
+    totalOpens,
+    activeMakers,
+    usageByDay
+  };
+};
