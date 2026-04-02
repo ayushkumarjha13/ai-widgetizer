@@ -210,18 +210,20 @@ export const fetchSaaSStats = async () => {
     getDocs(collection(db, 'analytics'))
   ]);
 
-  const totalUsers = usersSnap.size;
-  const totalWidgets = widgetsSnap.size;
+  const users = usersSnap.docs.map(d => ({ ...d.data(), id: d.id }));
+  const widgets = widgetsSnap.docs.map(d => ({ ...d.data(), id: d.id }));
   const events = analyticsSnap.docs.map(d => d.data() as WidgetEvent);
 
+  const totalUsers = users.length;
+  const totalWidgets = widgets.length;
   const totalMessages = events.filter(e => e.eventType === 'message').length;
   const totalOpens = events.filter(e => e.eventType === 'open').length;
 
   // Active Users (those who created at least one widget)
-  const uniqueOwners = new Set(widgetsSnap.docs.map(d => d.data().ownerUid));
+  const uniqueOwners = new Set(widgets.map((w: any) => w.ownerUid));
   const activeMakers = uniqueOwners.size;
 
-  // Usage by day (Global)
+  // Global usage by day
   const usageByDay: Record<string, number> = {};
   events.forEach(ev => {
     if (ev.ts) {
@@ -236,6 +238,8 @@ export const fetchSaaSStats = async () => {
     totalMessages,
     totalOpens,
     activeMakers,
-    usageByDay
+    usageByDay,
+    users: users.sort((a: any, b: any) => (b.updatedAt?.seconds || 0) - (a.updatedAt?.seconds || 0)),
+    widgets: widgets.sort((a: any, b: any) => (b.updatedAt?.seconds || 0) - (a.updatedAt?.seconds || 0))
   };
 };
