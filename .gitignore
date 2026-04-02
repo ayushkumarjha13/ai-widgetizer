@@ -22,5 +22,4 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
-# .env (Unignored temporarily for private repo push)
-#.env
+.env
