@@ -3,9 +3,9 @@ import Sidebar from '../components/Sidebar';
 import { useAuthStore } from '../store/authStore';
 import { fetchSaaSStats } from '../lib/firestoreService';
 import { 
-  Users, MessageSquare, Globe, 
-  TrendingUp, Zap, Star, ShieldCheck, ArrowUpRight,
-  AlertCircle, ExternalLink, Calendar, Plus
+  Users, MessageSquare, 
+  TrendingUp, Zap, Star, ShieldCheck,
+  AlertCircle, ExternalLink
 } from 'lucide-react';
 
 const DAYS_ABBR = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
