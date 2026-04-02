@@ -225,11 +225,34 @@ export const fetchSaaSStats = async () => {
 
   // Global usage by day
   const usageByDay: Record<string, number> = {};
+  const widgetMetrics: Record<string, number> = {};
+  
   events.forEach(ev => {
     if (ev.ts) {
       const day = (ev.ts as Timestamp).toDate().toISOString().slice(0, 10);
       usageByDay[day] = (usageByDay[day] || 0) + 1;
     }
+    
+    // Aggregating global widget leaderboard (all time)
+    if (ev.eventType === 'message') {
+       widgetMetrics[ev.widgetId] = (widgetMetrics[ev.widgetId] || 0) + 1;
+    }
+  });
+
+  // Top 5 Widgets
+  const leaderboard = Object.entries(widgetMetrics)
+    .sort((a,b) => b[1] - a[1])
+    .slice(0, 5)
+    .map(([id, count]) => {
+      const w = widgets.find((x: any) => x.id === id) as any;
+      return { id, name: w?.name || 'Deleted Widget', count };
+    });
+
+  // Plan distribution
+  const plans = { starter: 0, business: 0 };
+  users.forEach((u: any) => {
+    if (u.plan === 'business') plans.business++;
+    else plans.starter++;
   });
 
   return {
@@ -239,6 +262,8 @@ export const fetchSaaSStats = async () => {
     totalOpens,
     activeMakers,
     usageByDay,
+    plans,
+    leaderboard,
     users: users.sort((a: any, b: any) => (b.updatedAt?.seconds || 0) - (a.updatedAt?.seconds || 0)),
     widgets: widgets.sort((a: any, b: any) => (b.updatedAt?.seconds || 0) - (a.updatedAt?.seconds || 0))
   };

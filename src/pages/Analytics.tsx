@@ -6,7 +6,7 @@ import { fetchAnalyticsForUser } from '../lib/firestoreService';
 import type { AnalyticsSummary } from '../lib/firestoreService';
 import { 
   BarChart2, Users, MessageSquare, Globe, Clock, 
-  TrendingUp, Zap, Smile, Meh, Frown, Download 
+  TrendingUp, Smile, Meh, Frown, Download 
 } from 'lucide-react';
 
 type AllAnalytics = Record<string, AnalyticsSummary>;
@@ -89,7 +89,6 @@ const Analytics = () => {
     .sort((a, b) => b[1] - a[1])
     .slice(0, 6);
 
-  const isDemo = !user?.uid.startsWith('dev-mode') && Object.keys(analytics).length === 0 && !loadingAnalytics;
 
   const handleExportCSV = () => {
     const headers = ['WidgetId', 'Total Opens', 'Total Messages', 'Unique Sessions', 'Happy', 'Neutral', 'Angry'].join(',');
@@ -138,13 +137,6 @@ const Analytics = () => {
 
         <div style={{ padding: '2rem', display: 'flex', flexDirection: 'column', gap: '2rem', overflowY: 'auto', flex: 1 }}>
 
-          {/* Demo Notice */}
-          {isDemo && (
-            <div className="analytics-notice">
-              <Zap size={18} />
-              <span>Analytics data will appear here once you deploy your widget and visitors start interacting with it.</span>
-            </div>
-          )}
 
           {/* Stat Cards */}
           <div className="analytics-grid">

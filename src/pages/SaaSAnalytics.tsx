@@ -161,30 +161,35 @@ const SaaSAnalytics = () => {
                   </div>
                 </div>
 
-                <div className="analytics-card">
-                   <div className="analytics-card-header">
-                      <Zap size={18} />
-                      <h4>Quick User Scan</h4>
+            <div className="analytics-card" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', padding: '1.5rem' }}>
+                <h4 style={{ margin: 0, fontSize: '1rem', fontWeight: 800 }}>SaaS Revenue & Plan Stats</h4>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                   <div style={{ padding: '1rem', background: '#f5f3ff', borderRadius: '12px', border: '1px solid #ddd6fe' }}>
+                      <p style={{ margin: '0 0 4px', fontSize: '0.65rem', color: '#7c3aed', fontWeight: 800 }}>BUSINESS USERS</p>
+                      <h4 style={{ margin: 0, color: '#7c3aed' }}>{stats?.plans.business || 0}</h4>
                    </div>
-                   <div style={{ padding: '1rem' }}>
-                      {stats?.users.slice(0, 5).map((u: any) => (
-                         <div key={u.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0', borderBottom: '1px solid #f1f5f9' }}>
-                            <div>
-                               <p style={{ margin: 0, fontSize: '0.9rem', fontWeight: 600 }}>{u.email}</p>
-                               <p style={{ margin: 0, fontSize: '0.7rem', color: '#94a3b8' }}>Plan: {u.plan || 'Free'}</p>
-                            </div>
-                            <span style={{ fontSize: '0.7rem', color: '#64748b' }}>
-                               {(u.updatedAt as any)?.toDate?.().toLocaleDateString() || '--'}
-                            </span>
-                         </div>
-                      ))}
-                      <button 
-                        onClick={() => setActiveTab('users')}
-                        style={{ width: '100%', padding: '10px', marginTop: '1rem', border: '1px solid #eef2ff', background: '#f5f7ff', borderRadius: '8px', color: '#6366f1', fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer' }}
-                      >View All User Records</button>
+                   <div style={{ padding: '1rem', background: '#f8fafc', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+                      <p style={{ margin: '0 0 4px', fontSize: '0.65rem', color: '#64748b', fontWeight: 800 }}>STARTER USERS</p>
+                      <h4 style={{ margin: 0 }}>{stats?.plans.starter || 0}</h4>
                    </div>
                 </div>
-              </div>
+                
+                <div>
+                   <h4 style={{ margin: '0 0 1rem', fontSize: '1rem', fontWeight: 800 }}>Top Widgets Leaderboard</h4>
+                   <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                      {stats?.leaderboard.map((w: any, i: number) => (
+                         <div key={w.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px', background: '#fff', border: '1px solid #f1f5f9', borderRadius: '8px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                               <span style={{ fontSize: '0.7rem', fontWeight: 700, color: '#94a3b8' }}>#{i+1}</span>
+                               <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>{w.name}</span>
+                            </div>
+                            <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#6366f1' }}>{w.count} msg</span>
+                         </div>
+                      ))}
+                   </div>
+                </div>
+            </div>
+          </div>
             </>
           )}
 
