@@ -46,7 +46,8 @@ const Login = () => {
         }
       }
       navigate('/dashboard');
-    } catch (err: any) {
+    } catch (e: unknown) {
+      const err = e as { code?: string; message?: string };
       if (err.code === 'auth/api-key-not-valid' || auth.app.options.apiKey?.includes('DummyKey')) {
         const devUser = { uid: 'dev-mode-user', email: email || 'developer@local.host' };
         try {
@@ -54,7 +55,7 @@ const Login = () => {
         } catch (firestoreErr) {
           console.warn('Could not sync dev user to Firestore:', firestoreErr);
         }
-        setUser(devUser as any);
+        setUser(devUser as Parameters<typeof setUser>[0]);
         navigate('/dashboard');
       } else {
         setError(err.message || 'Authentication failed.');
@@ -80,7 +81,8 @@ const Login = () => {
         }
       }
       navigate('/dashboard');
-    } catch (err: any) {
+    } catch (e: unknown) {
+      const err = e as { code?: string; message?: string };
       if (err.message === 'dummy-key' || err.code === 'auth/api-key-not-valid' || auth.app.options.apiKey?.includes('DummyKey')) {
         const googleUser = { uid: 'dev-mode-google', email: 'google.user@local.host' };
         try {
@@ -88,7 +90,7 @@ const Login = () => {
         } catch (firestoreErr) {
           console.warn('Could not sync dev user to Firestore:', firestoreErr);
         }
-        setUser(googleUser as any);
+        setUser(googleUser as Parameters<typeof setUser>[0]);
         navigate('/dashboard');
       } else {
         setError(err.message || 'Google Authentication failed.');
@@ -282,7 +284,7 @@ const Login = () => {
   );
 };
 
-const FeatureCard = ({ icon, title, desc }: { icon: any, title: string, desc: string }) => (
+const FeatureCard = ({ icon, title, desc }: { icon: React.ReactNode, title: string, desc: string }) => (
   <div style={{ padding: '2.5rem', background: '#fff', borderRadius: '24px', border: '1px solid #f1f5f9', transition: '0.3s' }} className="hover-lift">
     <div style={{ width: '48px', height: '48px', background: '#f5f7ff', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1.5rem' }}>
       {icon}
@@ -293,7 +295,7 @@ const FeatureCard = ({ icon, title, desc }: { icon: any, title: string, desc: st
 );
 
 
-const FooterCol = ({ title, links }: any) => (
+const FooterCol = ({ title, links }: { title: string, links: string[] }) => (
   <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
     <h4 style={{ fontWeight: 800, fontSize: '1rem' }}>{title}</h4>
     {links.map((l: string) => (
