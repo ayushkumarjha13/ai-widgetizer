@@ -49,7 +49,11 @@ const Login = () => {
     } catch (err: any) {
       if (err.code === 'auth/api-key-not-valid' || auth.app.options.apiKey?.includes('DummyKey')) {
         const devUser = { uid: 'dev-mode-user', email: email || 'developer@local.host' };
-        await syncUserDoc(devUser.uid, devUser.email);
+        try {
+          await syncUserDoc(devUser.uid, devUser.email);
+        } catch (firestoreErr) {
+          console.warn('Could not sync dev user to Firestore:', firestoreErr);
+        }
         setUser(devUser as any);
         navigate('/dashboard');
       } else {
@@ -77,10 +81,18 @@ const Login = () => {
       }
       navigate('/dashboard');
     } catch (err: any) {
-      const googleUser = { uid: 'dev-mode-google', email: 'google.user@local.host' };
-      await syncUserDoc(googleUser.uid, googleUser.email);
-      setUser(googleUser as any);
-      navigate('/dashboard');
+      if (err.message === 'dummy-key' || err.code === 'auth/api-key-not-valid' || auth.app.options.apiKey?.includes('DummyKey')) {
+        const googleUser = { uid: 'dev-mode-google', email: 'google.user@local.host' };
+        try {
+          await syncUserDoc(googleUser.uid, googleUser.email);
+        } catch (firestoreErr) {
+          console.warn('Could not sync dev user to Firestore:', firestoreErr);
+        }
+        setUser(googleUser as any);
+        navigate('/dashboard');
+      } else {
+        setError(err.message || 'Google Authentication failed.');
+      }
     }
   };
 
