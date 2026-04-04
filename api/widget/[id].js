@@ -42,10 +42,17 @@ export default async function handler(req, res) {
     const response = await fetch(url);
 
     if (!response.ok) {
+      const errorText = await response.text();
+      console.error('API Error: Firestore responded with:', response.status, errorText);
       if (response.status === 404) {
         return res.status(404).json({ error: 'Widget not found' });
       }
-      throw new Error('Failed to fetch from Firestore');
+      return res.status(500).json({ 
+        error: 'Firestore Fetch Failed',
+        status: response.status,
+        details: errorText,
+        url: url.replace(apiKey, 'HIDDEN')
+      });
     }
 
     const data = await response.json();
