@@ -13,7 +13,8 @@ const generateEmbedCode = (c: WidgetConfig) => {
 <script src="${host}/widget.js"></script>
 <script>
   ChatWidget.init({
-    widgetId: "${c.id || 'YOUR_WIDGET_ID'}"
+    widgetId: "${c.id || 'YOUR_WIDGET_ID'}",
+    baseUrl: "${host}"
   });
 </script>`;
 };

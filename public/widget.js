@@ -8,13 +8,14 @@
 
       const widgetId = config.widgetId;
       
-      // Auto-detect base URL from script src
-      let baseUrl = '';
-      const scripts = document.getElementsByTagName('script');
-      for (let i = 0; i < scripts.length; i++) {
-        if (scripts[i].src && scripts[i].src.includes('widget.js')) {
-          baseUrl = new URL(scripts[i].src).origin;
-          break;
+      let baseUrl = config.baseUrl || '';
+      if (!baseUrl) {
+        const scripts = document.getElementsByTagName('script');
+        for (let i = 0; i < scripts.length; i++) {
+          if (scripts[i].src && scripts[i].src.includes('widget.js')) {
+            baseUrl = new URL(scripts[i].src).origin;
+            break;
+          }
         }
       }
       
@@ -37,7 +38,12 @@
           localStorage.setItem('chat_session_' + widgetId, sId);
         }
 
-        // 3. Render UI
+        // 3. Wait for body to be ready
+        while (!document.body) {
+          await new Promise(resolve => setTimeout(resolve, 50));
+        }
+
+        // 4. Render UI
         if (document.getElementById('ai-chat-wrapper')) return;
         const root = document.createElement('div');
         root.id = 'ai-chat-wrapper';

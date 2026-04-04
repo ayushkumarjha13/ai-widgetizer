@@ -159,9 +159,9 @@
         html = html.replace(/(<li>[\s\S]*?<\/li>)/g,'<ul>$1</ul>').replace(/<\/ul>\s*<ul>/g,'');
         /* Links */
         html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g,'<a href="$2" target="_blank">$1</a>');
-        html = html.replace(/(https?:\/\/[^\s<>"]+)/g, function(u, o, f) {
-          var p = f.substring(o - 2, o); if (p === '="' || p === "='") return u;
-          var l = u.match(/[.,!?;:]+$/); var cu = l ? u.substring(0, u.length - l[0].length) : u;
+        html = html.replace(/(https?:\/\/[^\s<>"]+)/g, function(match, p1, offset, string) {
+          var p = string.substring(offset - 2, offset); if (p === '="' || p === "='") return match;
+          var l = match.match(/[.,!?;:]+$/); var cu = l ? match.substring(0, match.length - l[0].length) : match;
           return '<a href="'+cu+'" target="_blank">'+cu+'</a>' + (l ? l[0] : '');
         });
         return html.replace(/\r?\n/g,'<br>');
