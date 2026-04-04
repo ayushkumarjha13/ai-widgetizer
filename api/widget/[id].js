@@ -19,8 +19,12 @@ export default async function handler(req, res) {
   }
 
   const { id } = req.query;
-  const projectId = process.env.VITE_FIREBASE_PROJECT_ID;
-  const apiKey = process.env.VITE_FIREBASE_API_KEY;
+  const projectId = process.env.VITE_FIREBASE_PROJECT_ID || process.env.FIREBASE_PROJECT_ID;
+  const apiKey = process.env.VITE_FIREBASE_API_KEY || process.env.FIREBASE_API_KEY;
+
+  console.log('API: Processing request for id:', id);
+  console.log('API: Project ID exists:', !!projectId);
+  console.log('API: API Key exists:', !!apiKey);
 
   if (!id) {
     return res.status(400).json({ error: 'Widget ID is required' });
@@ -98,6 +102,10 @@ export default async function handler(req, res) {
 
   } catch (error) {
     console.error('API Error:', error);
-    return res.status(500).json({ error: 'Internal Server Error' });
+    return res.status(500).json({ 
+      error: 'Internal Server Error',
+      details: error.message,
+      env: { project: !!projectId, key: !!apiKey }
+    });
   }
 }
