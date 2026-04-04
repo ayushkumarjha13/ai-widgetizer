@@ -17,12 +17,18 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { widgetId, eventType, sessionId, country, sentiment } = req.body;
-  const projectId = process.env.VITE_FIREBASE_PROJECT_ID;
-  const apiKey = process.env.VITE_FIREBASE_API_KEY;
+  const { widgetId, eventType, sessionId, country, sentiment } = req.body || {};
+  const projectId = process.env.VITE_FIREBASE_PROJECT_ID || process.env.FIREBASE_PROJECT_ID;
+  const apiKey = process.env.VITE_FIREBASE_API_KEY || process.env.FIREBASE_API_KEY;
 
   if (!widgetId || !eventType) {
+    console.error('Track API: Missing fields:', { widgetId, eventType });
     return res.status(400).json({ error: 'Missing required fields' });
+  }
+
+  if (!projectId || !apiKey) {
+    console.error('Track API: Missing credentials');
+    return res.status(500).json({ error: 'Server configuration error' });
   }
 
   try {
@@ -49,6 +55,8 @@ export default async function handler(req, res) {
     });
 
     if (!response.ok) {
+      const errText = await response.text();
+      console.error('Track API: Firestore rejected:', response.status, errText);
       throw new Error('Failed to save to Firestore');
     }
 
