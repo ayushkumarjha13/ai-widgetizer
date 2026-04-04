@@ -6,6 +6,7 @@
         return;
       }
 
+      console.log('ChatWidget: Starting init for widgetId:', config.widgetId);
       const widgetId = config.widgetId;
       
       let baseUrl = config.baseUrl || '';
@@ -24,12 +25,18 @@
         baseUrl = window.location.origin;
         console.warn('ChatWidget: Base URL not detected, falling back to origin.', baseUrl);
       }
+      console.log('ChatWidget: Using baseUrl:', baseUrl);
 
       try {
         // 1. Fetch config from backend
+        console.log('ChatWidget: Fetching config from:', `${baseUrl}/api/widget/${widgetId}`);
         const response = await fetch(`${baseUrl}/api/widget/${widgetId}`);
-        if (!response.ok) throw new Error('Failed to fetch widget configuration');
+        if (!response.ok) {
+          console.error('ChatWidget: Fetch failed with status:', response.status);
+          throw new Error('Failed to fetch widget configuration');
+        }
         const c = await response.json();
+        console.log('ChatWidget: Received config:', c);
 
         // 2. Set up session
         let sId;
