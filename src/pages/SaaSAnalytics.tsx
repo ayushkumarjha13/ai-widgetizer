@@ -74,21 +74,21 @@ const SaaSAnalytics = () => {
               <p style={{ margin: 0, fontSize: '0.75rem' }}>Global monitoring & user tracking</p>
             </div>
           </div>
-          <div style={{ display: 'flex', gap: '12px' }}>
+          <div className="saas-tabs-container" style={{ display: 'flex', gap: '8px', overflowX: 'auto', paddingBottom: '4px', maxWidth: '100%' }}>
              <button 
                 onClick={() => setActiveTab('overview')}
                 className={`btn ${activeTab === 'overview' ? 'btn-primary' : 'btn-outline'}`} 
-                style={{ padding: '6px 16px', fontSize: '0.8rem' }}
+                style={{ padding: '6px 16px', fontSize: '0.75rem', whiteSpace: 'nowrap' }}
              >Overview</button>
              <button 
                 onClick={() => setActiveTab('users')}
                 className={`btn ${activeTab === 'users' ? 'btn-primary' : 'btn-outline'}`}
-                style={{ padding: '6px 16px', fontSize: '0.8rem' }}
+                style={{ padding: '6px 16px', fontSize: '0.75rem', whiteSpace: 'nowrap' }}
              >Users ({stats?.totalUsers || 0})</button>
              <button 
                 onClick={() => setActiveTab('widgets')}
                 className={`btn ${activeTab === 'widgets' ? 'btn-primary' : 'btn-outline'}`}
-                style={{ padding: '6px 16px', fontSize: '0.8rem' }}
+                style={{ padding: '6px 16px', fontSize: '0.75rem', whiteSpace: 'nowrap' }}
              >Widgets ({stats?.totalWidgets || 0})</button>
           </div>
         </div>
@@ -139,7 +139,7 @@ const SaaSAnalytics = () => {
                 />
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '2rem' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
                 <div className="analytics-card">
                   <div className="analytics-card-header">
                     <TrendingUp size={18} />
