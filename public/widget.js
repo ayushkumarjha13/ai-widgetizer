@@ -32,10 +32,16 @@
         const c = await response.json();
 
         // 2. Set up session
-        let sId = localStorage.getItem('chat_session_' + widgetId);
-        if (!sId) {
+        let sId;
+        try {
+          sId = localStorage.getItem('chat_session_' + widgetId);
+          if (!sId) {
+            sId = 'sess_' + Math.random().toString(36).substring(2, 15);
+            localStorage.setItem('chat_session_' + widgetId, sId);
+          }
+        } catch (e) {
+          console.warn('ChatWidget: LocalStorage not available, using temporary session.');
           sId = 'sess_' + Math.random().toString(36).substring(2, 15);
-          localStorage.setItem('chat_session_' + widgetId, sId);
         }
 
         // 3. Wait for body to be ready
