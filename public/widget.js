@@ -29,8 +29,9 @@
 
       try {
         // 1. Fetch config from backend
-        console.log('ChatWidget: Fetching config from:', `${baseUrl}/api/widget/${widgetId}`);
-        const response = await fetch(`${baseUrl}/api/widget/${widgetId}`);
+        const configUrl = `${baseUrl}/api/widget/${widgetId}`;
+        console.log('ChatWidget: Loading from:', configUrl);
+        const response = await fetch(configUrl);
         if (!response.ok) {
           console.error('ChatWidget: Fetch failed with status:', response.status);
           throw new Error('Failed to fetch widget configuration');
