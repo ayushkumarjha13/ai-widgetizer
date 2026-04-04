@@ -21,10 +21,16 @@ export default async function handler(req, res) {
   const { id } = req.query;
   const projectId = process.env.VITE_FIREBASE_PROJECT_ID || process.env.FIREBASE_PROJECT_ID;
   const apiKey = process.env.VITE_FIREBASE_API_KEY || process.env.FIREBASE_API_KEY;
-
   console.log('API: Processing request for id:', id);
-  console.log('API: Project ID exists:', !!projectId);
-  console.log('API: API Key exists:', !!apiKey);
+  
+  if (!projectId || !apiKey) {
+    console.error('API Error: Missing credentials (projectId or apiKey)');
+    return res.status(500).json({ 
+      error: 'Missing Firebase Configuration',
+      details: 'Firebase Project ID or API Key is not set in environment variables on the server.',
+      env: { project: !!projectId, key: !!apiKey }
+    });
+  }
 
   if (!id) {
     return res.status(400).json({ error: 'Widget ID is required' });
@@ -44,6 +50,15 @@ export default async function handler(req, res) {
 
     const data = await response.json();
     const f = data.fields;
+
+    if (!f) {
+      console.error('API Error: Firestore document has no fields:', data);
+      return res.status(500).json({ 
+        error: 'Data Corruption', 
+        details: 'Widget found but has no valid configuration data (Firestore fields missing).',
+        rawData: data
+      });
+    }
 
     // Helper to safely extract values from Firestore's structured JSON
     const getVal = (field) => {
