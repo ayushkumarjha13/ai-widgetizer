@@ -190,6 +190,8 @@
           let res = html.join('');
           res = res.replace(/\*\*([^\*]+)\*\*/g, '<strong>$1</strong>');
           res = res.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank">$1</a>');
+          // Autolink raw URLs that are not already in a markdown link
+          res = res.replace(/(?<!href=")(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank">$1</a>');
           return res;
         };
 
