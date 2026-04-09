@@ -2,6 +2,7 @@
  * API Route: POST /api/track
  * Securely records widget analytics events to Firestore.
  */
+import geoip from 'geoip-lite';
 
 export default async function handler(req, res) {
   // CORS Headers
@@ -17,7 +18,7 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { widgetId, eventType, sessionId, country, sentiment } = req.body || {};
+  const { widgetId, eventType, sessionId, sentiment } = req.body || {};
   const projectId = process.env.VITE_FIREBASE_PROJECT_ID || process.env.FIREBASE_PROJECT_ID;
   const apiKey = process.env.VITE_FIREBASE_API_KEY || process.env.FIREBASE_API_KEY;
 
@@ -31,6 +32,23 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: 'Server configuration error' });
   }
 
+  let detectedCountry = 'Unknown';
+  try {
+    const forwarded = req.headers['x-forwarded-for'];
+    let ip = forwarded ? forwarded.split(',')[0].trim() : req.socket?.remoteAddress;
+    
+    if (ip) {
+      if (ip.includes('::ffff:')) ip = ip.split('::ffff:')[1];
+      const geo = geoip.lookup(ip);
+      if (geo && geo.country) {
+        const regionNames = new Intl.DisplayNames(['en'], { type: 'region' });
+        detectedCountry = regionNames.of(geo.country) || geo.country;
+      }
+    }
+  } catch (e) {
+    console.error('GeoIP Error:', e);
+  }
+
   try {
     const url = `https://firestore.googleapis.com/v1/projects/${projectId}/databases/(default)/documents/analytics?key=${apiKey}`;
 
@@ -40,7 +58,7 @@ export default async function handler(req, res) {
         eventType: { stringValue: eventType },
         sessionId: { stringValue: sessionId || 'unknown' },
         ts: { timestampValue: new Date().toISOString() },
-        country: { stringValue: country || 'Unknown' }
+        country: { stringValue: detectedCountry }
       }
     };
 

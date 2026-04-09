@@ -1,7 +1,15 @@
 export async function onRequestPost(context) {
   const { request, env } = context;
   const body = await request.json();
-  const { widgetId, eventType, sessionId, country, sentiment } = body;
+  const { widgetId, eventType, sessionId, sentiment } = body;
+  
+  let detectedCountry = request.headers.get('cf-ipcountry') || 'Unknown';
+  if (detectedCountry !== 'Unknown' && detectedCountry.length === 2) {
+    try {
+      const regionNames = new Intl.DisplayNames(['en'], { type: 'region' });
+      detectedCountry = regionNames.of(detectedCountry) || detectedCountry;
+    } catch(e) {}
+  }
   
   const projectId = env.VITE_FIREBASE_PROJECT_ID || env.FIREBASE_PROJECT_ID;
   const apiKey = env.VITE_FIREBASE_API_KEY || env.FIREBASE_API_KEY;
@@ -19,7 +27,7 @@ export async function onRequestPost(context) {
         eventType: { stringValue: eventType },
         sessionId: { stringValue: sessionId || 'unknown' },
         ts: { timestampValue: new Date().toISOString() },
-        country: { stringValue: country || 'Unknown' }
+        country: { stringValue: detectedCountry }
       }
     };
 

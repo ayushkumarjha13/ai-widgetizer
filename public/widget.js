@@ -151,18 +151,8 @@
             widgetId,
             eventType: type,
             sessionId: sId,
-            sentiment: sentiment || null,
-            country: window._rc_c || 'Unknown'
+            sentiment: sentiment || null
           };
-          
-          if (!window._rc_c) {
-            try {
-              const r = await fetch('https://ipapi.co/json/');
-              const j = await r.json();
-              window._rc_c = j.country_name || 'Unknown';
-              payload.country = window._rc_c;
-            } catch(e) {}
-          }
 
           fetch(`${baseUrl}/api/track`, {
             method: 'POST',
