@@ -2,7 +2,7 @@
  * API Route: POST /api/track
  * Securely records widget analytics events to Firestore.
  */
-import geoip from 'geoip-lite';
+import requestIp from 'request-ip';
 
 export default async function handler(req, res) {
   // CORS Headers
@@ -34,15 +34,15 @@ export default async function handler(req, res) {
 
   let detectedCountry = 'Unknown';
   try {
-    const forwarded = req.headers['x-forwarded-for'];
-    let ip = forwarded ? forwarded.split(',')[0].trim() : req.socket?.remoteAddress;
+    const ip = requestIp.getClientIp(req);
     
-    if (ip) {
-      if (ip.includes('::ffff:')) ip = ip.split('::ffff:')[1];
-      const geo = geoip.lookup(ip);
+    if (ip && ip !== '127.0.0.1' && ip !== '::1') {
+      const cleanIp = ip.replace('::ffff:', '');
+      const geoResponse = await fetch(`http://ip-api.com/json/${cleanIp}?fields=country`);
+      const geo = await geoResponse.json();
+      
       if (geo && geo.country) {
-        const regionNames = new Intl.DisplayNames(['en'], { type: 'region' });
-        detectedCountry = regionNames.of(geo.country) || geo.country;
+        detectedCountry = geo.country;
       }
     }
   } catch (e) {

@@ -1,5 +1,3 @@
-import geoip from 'geoip-lite';
-
 export async function onRequestPost(context) {
   const { request, env } = context;
   const body = await request.json();
@@ -10,12 +8,13 @@ export async function onRequestPost(context) {
     const forwarded = request.headers.get('x-forwarded-for') || request.headers.get('cf-connecting-ip');
     let ip = forwarded ? forwarded.split(',')[0].trim() : null;
     
-    if (ip) {
-      if (ip.includes('::ffff:')) ip = ip.split('::ffff:')[1];
-      const geo = geoip.lookup(ip);
+    if (ip && ip !== '127.0.0.1' && ip !== '::1') {
+      const cleanIp = ip.replace('::ffff:', '');
+      const geoResponse = await fetch(`http://ip-api.com/json/${cleanIp}?fields=country`);
+      const geo = await geoResponse.json();
+      
       if (geo && geo.country) {
-        const regionNames = new Intl.DisplayNames(['en'], { type: 'region' });
-        detectedCountry = regionNames.of(geo.country) || geo.country;
+        detectedCountry = geo.country;
       }
     }
   } catch(e) {
