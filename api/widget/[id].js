@@ -22,10 +22,10 @@ export default async function handler(req, res) {
   const projectId = process.env.VITE_FIREBASE_PROJECT_ID || process.env.FIREBASE_PROJECT_ID;
   const apiKey = process.env.VITE_FIREBASE_API_KEY || process.env.FIREBASE_API_KEY;
   console.log('API: Processing request for id:', id);
-  
+
   if (!projectId || !apiKey) {
     console.error('API Error: Missing credentials (projectId or apiKey)');
-    return res.status(500).json({ 
+    return res.status(500).json({
       error: 'Missing Firebase Configuration',
       details: 'Firebase Project ID or API Key is not set in environment variables on the server.',
       env: { project: !!projectId, key: !!apiKey }
@@ -47,7 +47,7 @@ export default async function handler(req, res) {
       if (response.status === 404) {
         return res.status(404).json({ error: 'Widget not found' });
       }
-      return res.status(500).json({ 
+      return res.status(500).json({
         error: 'Firestore Fetch Failed',
         status: response.status,
         details: errorText,
@@ -60,8 +60,8 @@ export default async function handler(req, res) {
 
     if (!f) {
       console.error('API Error: Firestore document has no fields:', data);
-      return res.status(500).json({ 
-        error: 'Data Corruption', 
+      return res.status(500).json({
+        error: 'Data Corruption',
         details: 'Widget found but has no valid configuration data (Firestore fields missing).',
         rawData: data
       });
@@ -124,7 +124,7 @@ export default async function handler(req, res) {
 
   } catch (error) {
     console.error('API Error:', error);
-    return res.status(500).json({ 
+    return res.status(500).json({
       error: 'Internal Server Error',
       details: error.message,
       env: { project: !!projectId, key: !!apiKey }

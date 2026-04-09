@@ -33,7 +33,7 @@ export default async function handler(req, res) {
 
   try {
     const url = `https://firestore.googleapis.com/v1/projects/${projectId}/databases/(default)/documents/analytics?key=${apiKey}`;
-    
+
     const payload = {
       fields: {
         widgetId: { stringValue: widgetId },

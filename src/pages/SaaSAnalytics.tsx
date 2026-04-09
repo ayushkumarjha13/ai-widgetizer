@@ -74,26 +74,34 @@ const SaaSAnalytics = () => {
               <p style={{ margin: 0, fontSize: '0.75rem' }}>Global monitoring & user tracking</p>
             </div>
           </div>
-          <div className="saas-tabs-container" style={{ display: 'flex', gap: '8px', overflowX: 'auto', paddingBottom: '4px', maxWidth: '100%' }}>
+        </div>
+
+        {/* Tabs Bar */}
+        <div className="saas-tabs-container" style={{ 
+            display: 'flex', gap: '8px', overflowX: 'auto', 
+            padding: '1rem 1.5rem', background: 'var(--surface-color)', 
+            borderBottom: '1px solid var(--border-color)',
+            scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch',
+            flexShrink: 0
+        }}>
              <button 
                 onClick={() => setActiveTab('overview')}
                 className={`btn ${activeTab === 'overview' ? 'btn-primary' : 'btn-outline'}`} 
-                style={{ padding: '6px 16px', fontSize: '0.75rem', whiteSpace: 'nowrap' }}
-             >Overview</button>
+                style={{ padding: '6px 16px', fontSize: '0.85rem', whiteSpace: 'nowrap', borderRadius: '100px' }}
+             >Dashboard</button>
              <button 
                 onClick={() => setActiveTab('users')}
                 className={`btn ${activeTab === 'users' ? 'btn-primary' : 'btn-outline'}`}
-                style={{ padding: '6px 16px', fontSize: '0.75rem', whiteSpace: 'nowrap' }}
-             >Users ({stats?.totalUsers || 0})</button>
+                style={{ padding: '6px 16px', fontSize: '0.85rem', whiteSpace: 'nowrap', borderRadius: '100px' }}
+             >Customer Base ({stats?.totalUsers || 0})</button>
              <button 
                 onClick={() => setActiveTab('widgets')}
                 className={`btn ${activeTab === 'widgets' ? 'btn-primary' : 'btn-outline'}`}
-                style={{ padding: '6px 16px', fontSize: '0.75rem', whiteSpace: 'nowrap' }}
-             >Widgets ({stats?.totalWidgets || 0})</button>
-          </div>
+                style={{ padding: '6px 16px', fontSize: '0.85rem', whiteSpace: 'nowrap', borderRadius: '100px' }}
+             >Deployments ({stats?.totalWidgets || 0})</button>
         </div>
 
-        <div style={{ padding: '2rem', display: 'flex', flexDirection: 'column', gap: '2rem', overflowY: 'auto', flex: 1 }}>
+        <div className="saas-overview-content" style={{ display: 'flex', flexDirection: 'column', gap: '2rem', overflowY: 'auto', flex: 1 }}>
           
           {error && (
              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', background: '#fef2f2', border: '1px solid #fee2e2', color: '#ef4444', padding: '1rem', borderRadius: '12px' }}>
@@ -107,9 +115,9 @@ const SaaSAnalytics = () => {
               <div className="analytics-grid">
                 <SaasStatCard
                   icon={<Users size={22} />}
-                  label="Total Registered"
+                  label="Total Users"
                   value={stats?.totalUsers || 0}
-                  subLabel="Users unique growth"
+                  subLabel="Registered accounts"
                   color="#6366f1"
                   loading={loading}
                 />
@@ -122,10 +130,10 @@ const SaaSAnalytics = () => {
                   loading={loading}
                 />
                 <SaasStatCard
-                  icon={<MessageSquare size={22} />}
-                  label="Total Messages"
-                  value={stats?.totalMessages || 0}
-                  subLabel="Platform load volume"
+                  icon={<TrendingUp size={22} />}
+                  label="Total Impressions"
+                  value={stats?.totalOpens || 0}
+                  subLabel="Widget load volume"
                   color="#f59e0b"
                   loading={loading}
                 />
@@ -133,63 +141,95 @@ const SaaSAnalytics = () => {
                   icon={<Star size={22} />}
                   label="Active Makers"
                   value={stats?.activeMakers || 0}
-                  subLabel="Users with creations"
+                  subLabel="Users with deployments"
                   color="#ec4899"
                   loading={loading}
                 />
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
-                <div className="analytics-card">
-                  <div className="analytics-card-header">
-                    <TrendingUp size={18} />
-                    <h4>Daily Platform Activity</h4>
-                  </div>
-                  <div className="day-chart">
-                    {last7Days.map((d, i) => (
-                      <div key={i} className="day-bar-col">
-                        <div className="day-bar-wrap">
-                          <div
-                            className="day-bar-fill"
-                            style={{ height: `${Math.round((d.count / maxDay) * 100)}%` }}
-                            title={`${d.count} events`}
-                          />
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+                  <div className="analytics-card">
+                    <div className="analytics-card-header">
+                      <TrendingUp size={18} />
+                      <h4>Daily Platform Activity</h4>
+                    </div>
+                    <div className="day-chart">
+                      {last7Days.map((d, i) => (
+                        <div key={i} className="day-bar-col">
+                          <div className="day-bar-wrap">
+                            <div
+                              className="day-bar-fill"
+                              style={{ height: `${Math.round((d.count / maxDay) * 100)}%` }}
+                              title={`${d.count} events`}
+                            />
+                          </div>
+                          <span className="day-label">{d.label}</span>
                         </div>
-                        <span className="day-label">{d.label}</span>
-                      </div>
-                    ))}
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="analytics-card">
+                    <div className="analytics-card-header">
+                      <Users size={18} />
+                      <h4>Recent Signups</h4>
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                      {stats?.users?.slice(0, 4).map((u: any) => (
+                        <div key={u.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: '12px', borderBottom: '1px solid #f1f5f9' }}>
+                           <div style={{ display: 'flex', flexDirection: 'column' }}>
+                               <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-main)' }}>{u.email}</span>
+                               <span style={{ fontSize: '0.7rem', color: '#94a3b8' }}>
+                                   {(u.updatedAt as any)?.toDate?.().toLocaleDateString() || 'Recently'}
+                               </span>
+                           </div>
+                           <span style={{ fontSize: '0.7rem', fontWeight: 700, padding: '4px 10px', background: '#ecfeff', color: '#0891b2', borderRadius: '100px', textTransform: 'uppercase' }}>
+                               Registered
+                           </span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
 
-            <div className="analytics-card" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', padding: '1.5rem' }}>
-                <h4 style={{ margin: 0, fontSize: '1rem', fontWeight: 800 }}>SaaS Revenue & Plan Stats</h4>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                   <div style={{ padding: '1rem', background: '#f5f3ff', borderRadius: '12px', border: '1px solid #ddd6fe' }}>
-                      <p style={{ margin: '0 0 4px', fontSize: '0.65rem', color: '#7c3aed', fontWeight: 800 }}>BUSINESS USERS</p>
-                      <h4 style={{ margin: 0, color: '#7c3aed' }}>{stats?.plans.business || 0}</h4>
-                   </div>
-                   <div style={{ padding: '1rem', background: '#f8fafc', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
-                      <p style={{ margin: '0 0 4px', fontSize: '0.65rem', color: '#64748b', fontWeight: 800 }}>STARTER USERS</p>
-                      <h4 style={{ margin: 0 }}>{stats?.plans.starter || 0}</h4>
-                   </div>
+                <div className="analytics-card" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', padding: '1.5rem' }}>
+                    <div>
+                      <h4 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 800 }}>Platform Growth Insights</h4>
+                      <p style={{ margin: '4px 0 0', fontSize: '0.8rem', color: 'var(--text-muted)' }}>Data to showcase to the public</p>
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                       <div style={{ padding: '1.25rem', background: '#f5f3ff', borderRadius: '12px', border: '1px solid #ddd6fe' }}>
+                          <p style={{ margin: '0 0 6px', fontSize: '0.7rem', color: '#7c3aed', fontWeight: 800, letterSpacing: '0.5px' }}>MESSAGES PROCESSED</p>
+                          <h4 style={{ margin: 0, color: '#7c3aed', fontSize: '1.75rem' }}>{stats?.totalMessages || 0}</h4>
+                       </div>
+                       <div style={{ padding: '1.25rem', background: '#ecfeff', borderRadius: '12px', border: '1px solid #cffafe' }}>
+                          <p style={{ margin: '0 0 6px', fontSize: '0.7rem', color: '#0891b2', fontWeight: 800, letterSpacing: '0.5px' }}>ENGAGEMENT RATE</p>
+                          <h4 style={{ margin: 0, color: '#0891b2', fontSize: '1.75rem' }}>{stats?.totalOpens ? Math.round((stats.totalMessages / Math.max(1, stats.totalOpens)) * 100) : 0}%</h4>
+                       </div>
+                    </div>
+                    
+                    <div style={{ marginTop: '1rem' }}>
+                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
+                         <h4 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 800 }}>Top Widgets</h4>
+                         <Zap size={16} color="#6366f1" />
+                       </div>
+                       <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                          {stats?.leaderboard?.slice(0, 5).map((w: any, i: number) => (
+                             <div key={w.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px', background: '#fff', border: '1px solid #f1f5f9', borderRadius: '10px', boxShadow: '0 1px 2px rgba(0,0,0,0.02)' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                   <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: i === 0 ? '#fef3c7' : i === 1 ? '#f1f5f9' : i === 2 ? '#ffedd5' : '#f8fafc', color: i === 0 ? '#d97706' : i === 1 ? '#64748b' : i === 2 ? '#c2410c' : '#94a3b8', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: 800 }}>
+                                      {i+1}
+                                   </div>
+                                   <span style={{ fontSize: '0.9rem', fontWeight: 600 }}>{w.name}</span>
+                                </div>
+                                <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#6366f1', background: '#eef2ff', padding: '4px 8px', borderRadius: '6px' }}>{w.count} msg</span>
+                             </div>
+                          ))}
+                       </div>
+                    </div>
                 </div>
-                
-                <div>
-                   <h4 style={{ margin: '0 0 1rem', fontSize: '1rem', fontWeight: 800 }}>Top Widgets Leaderboard</h4>
-                   <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                      {stats?.leaderboard.map((w: any, i: number) => (
-                         <div key={w.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px', background: '#fff', border: '1px solid #f1f5f9', borderRadius: '8px' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                               <span style={{ fontSize: '0.7rem', fontWeight: 700, color: '#94a3b8' }}>#{i+1}</span>
-                               <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>{w.name}</span>
-                            </div>
-                            <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#6366f1' }}>{w.count} msg</span>
-                         </div>
-                      ))}
-                   </div>
-                </div>
-            </div>
-          </div>
+              </div>
             </>
           )}
 
@@ -204,7 +244,7 @@ const SaaSAnalytics = () => {
                      <thead>
                         <tr style={{ background: '#f8fafc', borderBottom: '1px solid #f1f5f9' }}>
                            <th style={{ padding: '1rem 2rem', fontSize: '0.8rem', color: '#64748b' }}>EMAIL ADDRESS</th>
-                           <th style={{ padding: '1rem 2rem', fontSize: '0.8rem', color: '#64748b' }}>PLAN</th>
+                           <th style={{ padding: '1rem 2rem', fontSize: '0.8rem', color: '#64748b' }}>STATUS</th>
                            <th style={{ padding: '1rem 2rem', fontSize: '0.8rem', color: '#64748b' }}>LAST UPDATED</th>
                            <th style={{ padding: '1rem 2rem', fontSize: '0.8rem', color: '#64748b' }}>USER ID</th>
                         </tr>
@@ -214,8 +254,8 @@ const SaaSAnalytics = () => {
                            <tr key={u.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
                               <td style={{ padding: '1rem 2rem', fontSize: '0.9rem', fontWeight: 600 }}>{u.email}</td>
                               <td style={{ padding: '1rem 2rem' }}>
-                                 <span style={{ padding: '4px 10px', background: u.plan === 'business' ? '#f5f3ff' : '#f1f5f9', color: u.plan === 'business' ? '#7c3aed' : '#475569', borderRadius: '100px', fontSize: '0.7rem', fontWeight: 700, textTransform: 'uppercase' }}>
-                                    {u.plan || 'starter'}
+                                 <span style={{ padding: '4px 10px', background: '#ecfeff', color: '#0891b2', borderRadius: '100px', fontSize: '0.7rem', fontWeight: 700, textTransform: 'uppercase' }}>
+                                    Active
                                  </span>
                               </td>
                               <td style={{ padding: '1rem 2rem', fontSize: '0.85rem', color: '#64748b' }}>

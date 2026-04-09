@@ -601,6 +601,9 @@ input:checked + .toggle-slider:before { transform: translateX(20px); }
 
   /* Hidden label for small buttons */
   .header .btn-primary .btn-label { display: none; }
+
+  /* Mobile SaaS Dashboard fixes */
+  .saas-overview-content { padding: 1.25rem !important; gap: 1.5rem !important; }
 }
 
 @media (max-width: 480px) {

@@ -59,13 +59,16 @@
 
         // 4. Render UI
         if (document.getElementById('ai-chat-wrapper')) return;
-        const root = document.createElement('div');
-        root.id = 'ai-chat-wrapper';
-        document.body.appendChild(root);
+        const wrapper = document.createElement('div');
+        wrapper.id = 'ai-chat-wrapper';
+        document.body.appendChild(wrapper);
+        const root = wrapper.attachShadow({ mode: 'open' });
 
         const s = document.createElement('style');
         s.textContent = [
-          '#ai-chat-wrapper{--p:'+c.color+';--r:16px;font-family:system-ui,-apple-system,sans-serif;position:relative;z-index:999999}',
+          ':host{all:initial;--p:'+c.color+';--r:16px;font-family:system-ui,-apple-system,sans-serif;color:#1e293b;position:fixed;z-index:999999}',
+          '*,*::before,*::after{box-sizing:border-box}',
+          'input,button,textarea{font-family:inherit;color:inherit}',
           '.rc-l{position:fixed;bottom:20px;right:20px;width:60px;height:60px;background:var(--p);border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 12px 24px rgba(0,0,0,.2);z-index:999999;overflow:hidden;transition:transform .3s;border:none;padding:0}',
           '.rc-l:hover{transform:scale(1.1)}',
           '.rc-l img{width:100%;height:100%;object-fit:cover}',
@@ -128,9 +131,9 @@
         root.appendChild(lch);
         root.appendChild(win);
 
-        const ms = document.getElementById('rc-ms');
-        const hr = document.getElementById('rc-hr');
-        const inp = document.getElementById('rc-in');
+        const ms = root.getElementById('rc-ms');
+        const hr = root.getElementById('rc-hr');
+        const inp = root.getElementById('rc-in');
 
         // Analytics Helpers
         const getSentiment = (t) => {
@@ -168,7 +171,7 @@
           }).catch(() => {});
         };
 
-        trackEvent('open');
+        let hasTrackedOpen = false;
 
         const parseMD = (str) => {
           if (!str) return '';
@@ -210,13 +213,13 @@
         };
 
         const showType = () => {
-          if (document.getElementById('rc-typ')) return;
+          if (root.getElementById('rc-typ')) return;
           const row = document.createElement('div'); row.id = 'rc-typ'; row.className = 'rc-msg-row rc-row-bot';
           row.innerHTML = '<img src="'+c.logo+'" class="rc-msg-avatar"><div class="rc-msg rc-m-bot rc-typing"><span></span><span></span><span></span></div>';
           ms.appendChild(row); ms.scrollTop = ms.scrollHeight;
         };
 
-        const hideType = () => { const t = document.getElementById('rc-typ'); if (t) t.remove(); };
+        const hideType = () => { const t = root.getElementById('rc-typ'); if (t) t.remove(); };
 
         const sendMessage = async (t) => {
           if (!t || !t.trim()) return;
@@ -258,7 +261,7 @@
             b.className = 'rc-btn';
             b.textContent = p;
             b.onclick = () => sendMessage(p);
-            document.getElementById('rc-ps').appendChild(b);
+            root.getElementById('rc-ps').appendChild(b);
           });
         }
 
@@ -266,21 +269,29 @@
           win.classList.toggle('o');
           if (win.classList.contains('o')) {
             setTimeout(() => inp.focus(), 100);
+            if (!hasTrackedOpen) {
+              trackEvent('open');
+              hasTrackedOpen = true;
+            }
           }
         };
 
-        document.getElementById('rc-cx').onclick = (e) => {
+        root.getElementById('rc-cx').onclick = (e) => {
           e.stopPropagation();
           win.classList.remove('o');
         };
 
-        document.getElementById('rc-go').onclick = () => sendMessage(inp.value);
+        root.getElementById('rc-go').onclick = () => sendMessage(inp.value);
         inp.onkeydown = (e) => { if (e.key === 'Enter') sendMessage(inp.value); };
 
         if (c.autoOpen) {
           setTimeout(() => {
             win.classList.add('o');
             inp.focus();
+            if (!hasTrackedOpen) {
+              trackEvent('open');
+              hasTrackedOpen = true;
+            }
           }, 500);
         }
 
