@@ -1,14 +1,25 @@
+import geoip from 'geoip-lite';
+
 export async function onRequestPost(context) {
   const { request, env } = context;
   const body = await request.json();
   const { widgetId, eventType, sessionId, sentiment } = body;
   
-  let detectedCountry = request.headers.get('cf-ipcountry') || 'Unknown';
-  if (detectedCountry !== 'Unknown' && detectedCountry.length === 2) {
-    try {
-      const regionNames = new Intl.DisplayNames(['en'], { type: 'region' });
-      detectedCountry = regionNames.of(detectedCountry) || detectedCountry;
-    } catch(e) {}
+  let detectedCountry = 'Unknown';
+  try {
+    const forwarded = request.headers.get('x-forwarded-for') || request.headers.get('cf-connecting-ip');
+    let ip = forwarded ? forwarded.split(',')[0].trim() : null;
+    
+    if (ip) {
+      if (ip.includes('::ffff:')) ip = ip.split('::ffff:')[1];
+      const geo = geoip.lookup(ip);
+      if (geo && geo.country) {
+        const regionNames = new Intl.DisplayNames(['en'], { type: 'region' });
+        detectedCountry = regionNames.of(geo.country) || geo.country;
+      }
+    }
+  } catch(e) {
+    console.error('GeoIP Error:', e);
   }
   
   const projectId = env.VITE_FIREBASE_PROJECT_ID || env.FIREBASE_PROJECT_ID;
