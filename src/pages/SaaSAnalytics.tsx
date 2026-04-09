@@ -3,7 +3,7 @@ import Sidebar from '../components/Sidebar';
 import { useAuthStore } from '../store/authStore';
 import { fetchSaaSStats } from '../lib/firestoreService';
 import { 
-  Users, MessageSquare, 
+  Users, 
   TrendingUp, Zap, Star, ShieldCheck,
   AlertCircle, ExternalLink
 } from 'lucide-react';
