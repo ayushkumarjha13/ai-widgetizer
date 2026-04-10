@@ -8,8 +8,7 @@ import {
   where,
   addDoc,
   serverTimestamp,
-  Timestamp,
-  orderBy,
+  type Timestamp
 } from 'firebase/firestore';
 import { db } from './firebase';
 import type { WidgetConfig } from '../store/widgetStore';
@@ -140,17 +139,18 @@ export const fetchAnalyticsForUser = async (
 
   for (let i = 0; i < widgetIds.length; i += BATCH) {
     const batch = widgetIds.slice(i, i + BATCH);
-    let q = query(collection(db, 'analytics'), where('widgetId', 'in', batch));
-    
-    if (startDate) {
-      q = query(q, where('ts', '>=', Timestamp.fromDate(startDate)));
-    }
-    if (endDate) {
-      q = query(q, where('ts', '<=', Timestamp.fromDate(endDate)));
-    }
+    const q = query(collection(db, 'analytics'), where('widgetId', 'in', batch));
 
     const snap = await getDocs(q);
-    snap.docs.forEach(d => allDocs.push(d.data() as WidgetEvent));
+    snap.docs.forEach(d => {
+      const data = d.data() as WidgetEvent;
+      if (data.ts) {
+        const dDate = data.ts.toDate();
+        if (startDate && dDate < startDate) return;
+        if (endDate && dDate > endDate) return;
+      }
+      allDocs.push(data);
+    });
   }
 
   // Aggregate per widget
@@ -206,17 +206,19 @@ export const fetchConversationsForWidget = async (
   startDate?: Date,
   endDate?: Date
 ) => {
-  let q = query(
+  const q = query(
     collection(db, 'analytics'),
-    where('widgetId', '==', widgetId),
-    orderBy('ts', 'desc')
-  );
-
-  if (startDate) q = query(q, where('ts', '>=', Timestamp.fromDate(startDate)));
-  if (endDate) q = query(q, where('ts', '<=', Timestamp.fromDate(endDate)));
+    where('widgetId', '==', widgetId)
+  ); // Sorting/filtering client-side to avoid index dependency
 
   const snap = await getDocs(q);
-  const events = snap.docs.map(d => d.data() as WidgetEvent);
+  const events = snap.docs.map(d => d.data() as WidgetEvent).filter(ev => {
+    if (!ev.ts) return true;
+    const dDate = ev.ts.toDate();
+    if (startDate && dDate < startDate) return false;
+    if (endDate && dDate > endDate) return false;
+    return true;
+  });
 
   // Group by sessionId and find the latest activity for each
   const sessions: Record<string, {
@@ -252,11 +254,15 @@ export const fetchSessionMessages = async (sessionId: string) => {
   const q = query(
     collection(db, 'analytics'),
     where('sessionId', '==', sessionId),
-    where('eventType', '==', 'message'),
-    orderBy('ts', 'asc')
+    where('eventType', '==', 'message')
   );
   const snap = await getDocs(q);
-  return snap.docs.map(d => d.data() as WidgetEvent);
+  const events = snap.docs.map(d => d.data() as WidgetEvent);
+  return events.sort((a, b) => {
+    const aTime = a.ts?.toMillis() || 0;
+    const bTime = b.ts?.toMillis() || 0;
+    return aTime - bTime;
+  });
 };
 
 /** 
