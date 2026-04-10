@@ -18,7 +18,7 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { widgetId, eventType, sessionId, sentiment } = req.body || {};
+  const { widgetId, eventType, sessionId, sentiment, text, sender } = req.body || {};
   const projectId = process.env.VITE_FIREBASE_PROJECT_ID || process.env.FIREBASE_PROJECT_ID;
   const apiKey = process.env.VITE_FIREBASE_API_KEY || process.env.FIREBASE_API_KEY;
 
@@ -61,6 +61,9 @@ export default async function handler(req, res) {
         country: { stringValue: detectedCountry }
       }
     };
+
+    if (text) payload.fields.text = { stringValue: text };
+    if (sender) payload.fields.sender = { stringValue: sender };
 
     if (sentiment) {
       payload.fields.sentiment = { stringValue: sentiment };

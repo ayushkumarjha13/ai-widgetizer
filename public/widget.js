@@ -146,12 +146,19 @@
           return 'neutral';
         };
 
-        const trackEvent = async (type, sentiment) => {
+        // Simple Bot check
+        const isBot = /bot|googlebot|crawler|spider|robot|crawling/i.test(navigator.userAgent || '') || navigator.webdriver;
+
+        const trackEvent = async (type, sentiment, text, sender) => {
+          if (isBot) return; // Ignore bots
+          
           const payload = {
             widgetId,
             eventType: type,
             sessionId: sId,
-            sentiment: sentiment || null
+            sentiment: sentiment || null,
+            text: text || null,
+            sender: sender || null
           };
 
           fetch(`${baseUrl}/api/track`, {
@@ -162,6 +169,11 @@
         };
 
         let hasTrackedOpen = false;
+        try {
+          if (sessionStorage.getItem('cw_opened_' + widgetId)) {
+             hasTrackedOpen = true;
+          }
+        } catch(e) {}
 
         const parseMD = (str) => {
           if (!str) return '';
@@ -219,7 +231,7 @@
           addMessage(clean, false); 
           inp.value = ''; 
           showType();
-          trackEvent('message', getSentiment(clean));
+          trackEvent('message', getSentiment(clean), clean, 'user');
 
           try {
             const r = await fetch(c.hook, {
@@ -241,6 +253,7 @@
               }
             } else { res = d || 'Response received.'; }
             addMessage(String(res), true);
+            trackEvent('message', 'neutral', String(res), 'bot');
           } catch (err) {
             hideType();
             addMessage('Connection error. Please check your network or n8n workflow.', true);
@@ -264,6 +277,7 @@
             if (!hasTrackedOpen) {
               trackEvent('open');
               hasTrackedOpen = true;
+              try { sessionStorage.setItem('cw_opened_' + widgetId, '1'); } catch(e){}
             }
           }
         };
@@ -276,14 +290,13 @@
         root.getElementById('rc-go').onclick = () => sendMessage(inp.value);
         inp.onkeydown = (e) => { if (e.key === 'Enter') sendMessage(inp.value); };
 
-        if (c.autoOpen) {
+        if (c.autoOpen && !hasTrackedOpen) {
           setTimeout(() => {
             win.classList.add('o');
             inp.focus();
-            if (!hasTrackedOpen) {
-              trackEvent('open');
-              hasTrackedOpen = true;
-            }
+            trackEvent('open');
+            hasTrackedOpen = true;
+            try { sessionStorage.setItem('cw_opened_' + widgetId, '1'); } catch(e){}
           }, 500);
         }
 

@@ -2,12 +2,17 @@ import { useEffect, useState, useMemo } from 'react';
 import Sidebar from '../components/Sidebar';
 import { useAuthStore } from '../store/authStore';
 import { useWidgetStore } from '../store/widgetStore';
-import { fetchAnalyticsForUser } from '../lib/firestoreService';
-import type { AnalyticsSummary } from '../lib/firestoreService';
 import { 
   BarChart2, Users, MessageSquare, Globe, Clock, 
-  TrendingUp, Smile, Meh, Frown, Download 
+  TrendingUp, Smile, Meh, Frown, Download,
+  ArrowLeft, Bot, MessageCircle
 } from 'lucide-react';
+import { 
+  fetchAnalyticsForUser, 
+  fetchConversationsForWidget, 
+  fetchSessionMessages,
+} from '../lib/firestoreService';
+import type { WidgetEvent, AnalyticsSummary } from '../lib/firestoreService';
 
 type AllAnalytics = Record<string, AnalyticsSummary>;
 
@@ -26,6 +31,44 @@ const Analytics = () => {
   const [selectedWidgetId, setSelectedWidgetId] = useState<string>('all');
   const [loadingAnalytics, setLoadingAnalytics] = useState(false);
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
+  
+  // Date and Tab state
+  const [activeTab, setActiveTab] = useState<'overview' | 'conversations'>('overview');
+  const [dateRange, setDateRange] = useState<'all' | 'today' | 'yesterday' | 'week' | 'month'>('all');
+  
+  // Conversation state
+  const [sessions, setSessions] = useState<any[]>([]);
+  const [selectedSessionId, setSelectedSessionId] = useState<string | null>(null);
+  const [messages, setMessages] = useState<WidgetEvent[]>([]);
+  const [loadingMessages, setLoadingMessages] = useState(false);
+
+  const resolvedRange = useMemo(() => {
+    const now = new Date();
+    const start = new Date();
+    const end = new Date();
+    
+    if (dateRange === 'today') {
+      start.setHours(0, 0, 0, 0);
+      end.setHours(23, 59, 59, 999);
+      return { start, end };
+    }
+    if (dateRange === 'yesterday') {
+      start.setDate(now.getDate() - 1);
+      start.setHours(0, 0, 0, 0);
+      end.setDate(now.getDate() - 1);
+      end.setHours(23, 59, 59, 999);
+      return { start, end };
+    }
+    if (dateRange === 'week') {
+      start.setDate(now.getDate() - 7);
+      return { start, end };
+    }
+    if (dateRange === 'month') {
+      start.setMonth(now.getMonth() - 1);
+      return { start, end };
+    }
+    return { start: undefined, end: undefined };
+  }, [dateRange]);
 
   useEffect(() => {
     if (user) {
@@ -36,11 +79,31 @@ const Analytics = () => {
   useEffect(() => {
     if (!user) return;
     setLoadingAnalytics(true);
-    fetchAnalyticsForUser(user.uid)
+    fetchAnalyticsForUser(user.uid, resolvedRange.start, resolvedRange.end)
       .then(setAnalytics)
       .catch(console.error)
       .finally(() => setLoadingAnalytics(false));
-  }, [user]);
+  }, [user, resolvedRange]);
+
+  // Fetch sessions when entering conversations tab or switching widget
+  useEffect(() => {
+    if (activeTab === 'conversations' && selectedWidgetId !== 'all') {
+      fetchConversationsForWidget(selectedWidgetId, resolvedRange.start, resolvedRange.end)
+        .then(setSessions)
+        .catch(console.error);
+    }
+  }, [activeTab, selectedWidgetId, resolvedRange]);
+
+  // Fetch messages when a session is selected
+  useEffect(() => {
+    if (selectedSessionId) {
+      setLoadingMessages(true);
+      fetchSessionMessages(selectedSessionId)
+        .then(setMessages)
+        .catch(console.error)
+        .finally(() => setLoadingMessages(false));
+    }
+  }, [selectedSessionId]);
 
   // Aggregate across all widgets or a single selected one
   const aggData = useMemo<AnalyticsSummary>(() => {
@@ -121,21 +184,63 @@ const Analytics = () => {
             </div>
           </div>
 
-          {/* Widget Selector */}
-          <select
-            className="form-control"
-            style={{ width: 'auto', minWidth: '180px' }}
-            value={selectedWidgetId}
-            onChange={e => setSelectedWidgetId(e.target.value)}
-          >
-            <option value="all">All Widgets</option>
-            {savedWidgets.map(w => (
-              <option key={w.id} value={w.id!}>{w.name}</option>
-            ))}
-          </select>
+          {/* Controls Bar */}
+          <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+            {/* Tab Switcher */}
+            <div className="tab-switcher" style={{ display: 'flex', background: 'var(--surface-color)', padding: '4px', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
+              <button 
+                className={`tab-btn ${activeTab === 'overview' ? 'active' : ''}`}
+                onClick={() => setActiveTab('overview')}
+                style={{ padding: '6px 12px', borderRadius: '6px', border: 'none', background: activeTab === 'overview' ? 'var(--p)' : 'transparent', color: activeTab === 'overview' ? '#fff' : 'inherit', cursor: 'pointer', fontWeight: 600, fontSize: '0.85rem' }}
+              >
+                Overview
+              </button>
+              <button 
+                className={`tab-btn ${activeTab === 'conversations' ? 'active' : ''}`}
+                onClick={() => setActiveTab('conversations')}
+                style={{ padding: '6px 12px', borderRadius: '6px', border: 'none', background: activeTab === 'conversations' ? 'var(--p)' : 'transparent', color: activeTab === 'conversations' ? '#fff' : 'inherit', cursor: 'pointer', fontWeight: 600, fontSize: '0.85rem' }}
+              >
+                Conversations
+              </button>
+            </div>
+
+            {/* Date Preset */}
+            <select
+              className="form-control"
+              style={{ width: 'auto', minWidth: '130px' }}
+              value={dateRange}
+              onChange={e => setDateRange(e.target.value as any)}
+            >
+              <option value="all">All Time</option>
+              <option value="today">Today</option>
+              <option value="yesterday">Yesterday</option>
+              <option value="week">Last 7 Days</option>
+              <option value="month">Last 30 Days</option>
+            </select>
+
+            {/* Widget Selector */}
+            <select
+              className="form-control"
+              style={{ width: 'auto', minWidth: '180px' }}
+              value={selectedWidgetId}
+              onChange={e => {
+                setSelectedWidgetId(e.target.value);
+                setSelectedSessionId(null);
+                setSessions([]);
+              }}
+            >
+              <option value="all">All Widgets</option>
+              {savedWidgets.map(w => (
+                <option key={w.id} value={w.id!}>{w.name}</option>
+              ))}
+            </select>
+          </div>
         </div>
 
         <div style={{ padding: '2rem', display: 'flex', flexDirection: 'column', gap: '2rem', overflowY: 'auto', flex: 1 }}>
+          
+          {activeTab === 'overview' ? (
+            <>
 
 
           {/* Stat Cards */}
@@ -262,7 +367,111 @@ const Analytics = () => {
                 })}
               </div>
             )}
-          </div>
+            </div>
+          </>
+          ) : (
+            /* Conversations Tab Content */
+            <div className="conversations-container" style={{ display: 'flex', gap: '2rem', height: '100%', minHeight: '600px' }}>
+              {selectedWidgetId === 'all' ? (
+                <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--surface-color)', borderRadius: '12px', border: '1px dashed var(--border-color)', color: 'var(--text-muted)' }}>
+                  <div style={{ textAlign: 'center' }}>
+                    <MessageSquare size={48} style={{ marginBottom: '1rem', opacity: 0.2 }} />
+                    <p>Select a specific widget to view conversations</p>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  {/* Sessions List */}
+                  <div className="sessions-list" style={{ width: '350px', background: 'var(--surface-color)', borderRadius: '12px', border: '1px solid var(--border-color)', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+                    <div style={{ padding: '1.25rem', borderBottom: '1px solid var(--border-color)', fontWeight: 700 }}>
+                      Recent Chats ({sessions.length})
+                    </div>
+                    <div style={{ flex: 1, overflowY: 'auto' }}>
+                      {sessions.length === 0 ? (
+                        <p style={{ textAlign: 'center', padding: '2rem', opacity: 0.5, fontSize: '0.9rem' }}>No conversations found for this period.</p>
+                      ) : (
+                        sessions.map(s => (
+                          <div 
+                            key={s.sessionId}
+                            onClick={() => setSelectedSessionId(s.sessionId)}
+                            style={{ 
+                              padding: '1rem', borderBottom: '1px solid #f1f5f9', cursor: 'pointer',
+                              background: selectedSessionId === s.sessionId ? '#f5f3ff' : 'transparent',
+                              borderLeft: selectedSessionId === s.sessionId ? '4px solid var(--p)' : '4px solid transparent',
+                              transition: '0.2s'
+                            }}
+                          >
+                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                              <span style={{ fontSize: '0.75rem', fontWeight: 700, opacity: 0.6 }}>{COUNTRIES_EMOJI[s.country] || '🌍'} {s.country}</span>
+                              <span style={{ fontSize: '0.7rem', opacity: 0.5 }}>{s.lastTs.toLocaleDateString()}</span>
+                            </div>
+                            <p style={{ margin: 0, fontSize: '0.85rem', fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                              {s.lastMessage || 'Open Event'}
+                            </p>
+                            <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>{s.messageCount} messages</span>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Messages View */}
+                  <div className="messages-view" style={{ flex: 1, background: 'var(--surface-color)', borderRadius: '12px', border: '1px solid var(--border-color)', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+                    {!selectedSessionId ? (
+                      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)' }}>
+                        <p>Select a chat to view messages</p>
+                      </div>
+                    ) : (
+                      <>
+                        <div style={{ padding: '1rem 1.25rem', borderBottom: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                          <button onClick={() => setSelectedSessionId(null)} className="btn btn-outline" style={{ padding: '4px', borderRadius: '4px' }}>
+                            <ArrowLeft size={16} />
+                          </button>
+                          <div>
+                            <span style={{ fontSize: '0.85rem', fontWeight: 700 }}>Conversation</span>
+                            <code style={{ display: 'block', fontSize: '0.65rem', opacity: 0.5 }}>{selectedSessionId}</code>
+                          </div>
+                        </div>
+                        <div style={{ flex: 1, overflowY: 'auto', padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem', background: '#f8fafc' }}>
+                          {loadingMessages ? (
+                            <div style={{ display: 'flex', justifyContent: 'center', padding: '2rem' }}><span className="spinner" /></div>
+                          ) : messages.length === 0 ? (
+                            <div style={{ textAlign: 'center', opacity: 0.5, padding: '2rem' }}>
+                                <MessageCircle size={32} style={{ marginBottom: '1rem' }} />
+                                <p>This was an "Open Widget" event with no messages sent.</p>
+                            </div>
+                          ) : (
+                            messages.map((m, i) => (
+                              <div key={i} style={{ display: 'flex', justifyContent: m.sender === 'user' ? 'flex-end' : 'flex-start' }}>
+                                <div style={{ 
+                                  maxWidth: '80%', 
+                                  padding: '10px 14px', 
+                                  borderRadius: '12px',
+                                  background: m.sender === 'user' ? 'var(--p)' : '#fff',
+                                  color: m.sender === 'user' ? '#fff' : 'inherit',
+                                  border: m.sender === 'bot' ? '1px solid #e2e8f0' : 'none',
+                                  fontSize: '0.9rem',
+                                  boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
+                                }}>
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px', opacity: 0.8, fontSize: '0.7rem' }}>
+                                    {m.sender === 'bot' ? <Bot size={12} /> : <Users size={12} />}
+                                    <span>{m.sender === 'bot' ? 'AI Assistant' : 'Visitor'}</span>
+                                    <span>•</span>
+                                    <span>{m.ts?.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                                  </div>
+                                  <div style={{ whiteSpace: 'pre-wrap' }}>{m.text}</div>
+                                </div>
+                              </div>
+                            ))
+                          )}
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </>
+              )}
+            </div>
+          )}
 
         </div>
       </div>

@@ -9,6 +9,7 @@ import {
   addDoc,
   serverTimestamp,
   Timestamp,
+  orderBy,
 } from 'firebase/firestore';
 import { db } from './firebase';
 import type { WidgetConfig } from '../store/widgetStore';
@@ -108,6 +109,8 @@ export interface WidgetEvent {
   region?: string;
   sentiment?: 'happy' | 'neutral' | 'angry';
   sessionId: string;
+  text?: string;
+  sender?: 'user' | 'bot';
   ts: Timestamp | null;
 }
 
@@ -119,8 +122,12 @@ export const trackWidgetEvent = async (event: Omit<WidgetEvent, 'ts'>): Promise<
   });
 };
 
-/** Fetch aggregated analytics for all widgets owned by a user */
-export const fetchAnalyticsForUser = async (uid: string): Promise<Record<string, AnalyticsSummary>> => {
+/** Fetch aggregated analytics for all widgets owned by a user with optional date range */
+export const fetchAnalyticsForUser = async (
+  uid: string, 
+  startDate?: Date, 
+  endDate?: Date
+): Promise<Record<string, AnalyticsSummary>> => {
   // Get all widgets for this user first
   const widgets = await fetchUserWidgets(uid);
   const widgetIds = widgets.map(w => w.id!);
@@ -133,7 +140,15 @@ export const fetchAnalyticsForUser = async (uid: string): Promise<Record<string,
 
   for (let i = 0; i < widgetIds.length; i += BATCH) {
     const batch = widgetIds.slice(i, i + BATCH);
-    const q = query(collection(db, 'analytics'), where('widgetId', 'in', batch));
+    let q = query(collection(db, 'analytics'), where('widgetId', 'in', batch));
+    
+    if (startDate) {
+      q = query(q, where('ts', '>=', Timestamp.fromDate(startDate)));
+    }
+    if (endDate) {
+      q = query(q, where('ts', '<=', Timestamp.fromDate(endDate)));
+    }
+
     const snap = await getDocs(q);
     snap.docs.forEach(d => allDocs.push(d.data() as WidgetEvent));
   }
@@ -183,6 +198,65 @@ export const fetchAnalyticsForUser = async (uid: string): Promise<Record<string,
   });
 
   return result;
+};
+
+/** Fetch unique sessions for a widget within a date range */
+export const fetchConversationsForWidget = async (
+  widgetId: string,
+  startDate?: Date,
+  endDate?: Date
+) => {
+  let q = query(
+    collection(db, 'analytics'),
+    where('widgetId', '==', widgetId),
+    orderBy('ts', 'desc')
+  );
+
+  if (startDate) q = query(q, where('ts', '>=', Timestamp.fromDate(startDate)));
+  if (endDate) q = query(q, where('ts', '<=', Timestamp.fromDate(endDate)));
+
+  const snap = await getDocs(q);
+  const events = snap.docs.map(d => d.data() as WidgetEvent);
+
+  // Group by sessionId and find the latest activity for each
+  const sessions: Record<string, {
+    sessionId: string;
+    lastTs: Date;
+    country: string;
+    messageCount: number;
+    lastMessage?: string;
+  }> = {};
+
+  events.forEach(ev => {
+    if (!sessions[ev.sessionId]) {
+      sessions[ev.sessionId] = {
+        sessionId: ev.sessionId,
+        lastTs: ev.ts?.toDate() || new Date(),
+        country: ev.country || 'Unknown',
+        messageCount: 0,
+      };
+    }
+    if (ev.eventType === 'message') {
+      sessions[ev.sessionId].messageCount++;
+      if (!sessions[ev.sessionId].lastMessage && ev.text) {
+        sessions[ev.sessionId].lastMessage = ev.text;
+      }
+    }
+  });
+
+  return Object.values(sessions).sort((a, b) => b.lastTs.getTime() - a.lastTs.getTime());
+};
+
+/** Fetch all messages for a specific session */
+export const fetchSessionMessages = async (sessionId: string) => {
+  const q = query(
+    collection(db, 'analytics'),
+    where('sessionId', '==', sessionId),
+    where('eventType', '==', 'message'),
+    orderBy('ts', 'asc')
+  );
+  const snap = await getDocs(q);
+  return snap.docs.map(d => d.data() as WidgetEvent);
 };
 
 /** 
