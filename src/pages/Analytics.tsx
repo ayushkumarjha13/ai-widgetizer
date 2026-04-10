@@ -186,23 +186,28 @@ const Analytics = () => {
 
           {/* Controls Bar */}
           <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-            {/* Tab Switcher */}
-            <div className="tab-switcher" style={{ display: 'flex', background: 'var(--surface-color)', padding: '4px', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
+            {/* View Switcher Button */}
+            {activeTab === 'overview' ? (
               <button 
-                className={`tab-btn ${activeTab === 'overview' ? 'active' : ''}`}
-                onClick={() => setActiveTab('overview')}
-                style={{ padding: '6px 12px', borderRadius: '6px', border: 'none', background: activeTab === 'overview' ? 'var(--p)' : 'transparent', color: activeTab === 'overview' ? '#fff' : 'inherit', cursor: 'pointer', fontWeight: 600, fontSize: '0.85rem' }}
-              >
-                Overview
-              </button>
-              <button 
-                className={`tab-btn ${activeTab === 'conversations' ? 'active' : ''}`}
+                type="button"
+                className="btn"
                 onClick={() => setActiveTab('conversations')}
-                style={{ padding: '6px 12px', borderRadius: '6px', border: 'none', background: activeTab === 'conversations' ? 'var(--p)' : 'transparent', color: activeTab === 'conversations' ? '#fff' : 'inherit', cursor: 'pointer', fontWeight: 600, fontSize: '0.85rem' }}
+                style={{ display: 'flex', alignItems: 'center', gap: '8px', background: '#6366f1', color: '#fff', border: 'none', padding: '8px 16px', borderRadius: '8px', cursor: 'pointer', fontWeight: 600 }}
               >
-                Conversations
+                <MessageSquare size={18} />
+                <span>View Chat History</span>
               </button>
-            </div>
+            ) : (
+              <button 
+                type="button"
+                className="btn btn-outline"
+                onClick={() => setActiveTab('overview')}
+                style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 16px', borderRadius: '8px', cursor: 'pointer', fontWeight: 600 }}
+              >
+                <ArrowLeft size={18} />
+                <span>Back to Overview</span>
+              </button>
+            )}
 
             {/* Date Preset */}
             <select
@@ -447,7 +452,7 @@ const Analytics = () => {
                                   maxWidth: '80%', 
                                   padding: '10px 14px', 
                                   borderRadius: '12px',
-                                  background: m.sender === 'user' ? 'var(--p)' : '#fff',
+                                  background: m.sender === 'user' ? '#6366f1' : '#fff',
                                   color: m.sender === 'user' ? '#fff' : 'inherit',
                                   border: m.sender === 'bot' ? '1px solid #e2e8f0' : 'none',
                                   fontSize: '0.9rem',
