@@ -226,6 +226,7 @@ export const fetchConversationsForWidget = async (
     lastTs: Date;
     country: string;
     messageCount: number;
+    hasUserMessage: boolean;
     lastMessage?: string;
   }> = {};
 
@@ -236,10 +237,12 @@ export const fetchConversationsForWidget = async (
         lastTs: ev.ts?.toDate() || new Date(),
         country: ev.country || 'Unknown',
         messageCount: 0,
+        hasUserMessage: false,
       };
     }
-    if (ev.eventType === 'message') {
+    if (ev.eventType === 'message' && ev.text && ev.text.trim()) {
       sessions[ev.sessionId].messageCount++;
+      if (ev.sender === 'user') sessions[ev.sessionId].hasUserMessage = true;
       if (!sessions[ev.sessionId].lastMessage && ev.text) {
         sessions[ev.sessionId].lastMessage = ev.text;
       }
@@ -247,7 +250,7 @@ export const fetchConversationsForWidget = async (
   });
 
   return Object.values(sessions)
-    .filter(s => s.messageCount > 0)
+    .filter(s => s.hasUserMessage && s.messageCount > 0)
     .sort((a, b) => b.lastTs.getTime() - a.lastTs.getTime());
 };
 
@@ -259,7 +262,10 @@ export const fetchSessionMessages = async (sessionId: string) => {
     where('eventType', '==', 'message')
   );
   const snap = await getDocs(q);
-  const events = snap.docs.map(d => d.data() as WidgetEvent);
+  const events = snap.docs
+    .map(d => d.data() as WidgetEvent)
+    .filter(ev => ev.text && ev.text.trim());
+    
   return events.sort((a, b) => {
     const aTime = a.ts?.toMillis() || 0;
     const bTime = b.ts?.toMillis() || 0;
