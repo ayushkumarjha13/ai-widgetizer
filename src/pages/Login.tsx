@@ -38,14 +38,10 @@ const Login = () => {
       }
       
       if (user) {
-        // Enforce Email Verification (skip in local dummy mode)
-        if (!user.emailVerified && !user.email?.endsWith('@local.host')) {
+        // Enforce Email Verification (only for new signups)
+        if (isNewUser && !user.emailVerified && !user.email?.endsWith('@local.host')) {
           await signOut(auth);
-          if (isNewUser) {
-            setError('Account created! Please verify your email address to log in. We sent a link to your email.');
-          } else {
-            setError('Please verify your email address to log in.');
-          }
+          setError('Account created! Please verify your email address. We sent a link to your email.');
           return;
         }
 
