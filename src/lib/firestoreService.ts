@@ -246,7 +246,9 @@ export const fetchConversationsForWidget = async (
     }
   });
 
-  return Object.values(sessions).sort((a, b) => b.lastTs.getTime() - a.lastTs.getTime());
+  return Object.values(sessions)
+    .filter(s => s.messageCount > 0)
+    .sort((a, b) => b.lastTs.getTime() - a.lastTs.getTime());
 };
 
 /** Fetch all messages for a specific session */

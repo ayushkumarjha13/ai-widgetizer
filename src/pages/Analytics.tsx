@@ -411,7 +411,7 @@ const Analytics = () => {
                               <span style={{ fontSize: '0.7rem', opacity: 0.5 }}>{s.lastTs.toLocaleDateString()}</span>
                             </div>
                             <p style={{ margin: 0, fontSize: '0.85rem', fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                              {s.lastMessage || 'Open Event'}
+                              {s.lastMessage || 'Conversation started'}
                             </p>
                             <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>{s.messageCount} messages</span>
                           </div>
@@ -443,7 +443,7 @@ const Analytics = () => {
                           ) : messages.length === 0 ? (
                             <div style={{ textAlign: 'center', opacity: 0.5, padding: '2rem' }}>
                                 <MessageCircle size={32} style={{ marginBottom: '1rem' }} />
-                                <p>This was an "Open Widget" event with no messages sent.</p>
+                                <p>No messages sent yet.</p>
                             </div>
                           ) : (
                             messages.map((m, i) => (

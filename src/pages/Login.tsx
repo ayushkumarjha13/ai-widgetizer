@@ -5,7 +5,7 @@ import {
   Star
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword, sendEmailVerification, signOut } from 'firebase/auth';
 import { auth } from '../lib/firebase';
 import { useAuthStore } from '../store/authStore';
 import { syncUserDoc } from '../lib/firestoreService';
@@ -31,11 +31,24 @@ const Login = () => {
         const res = await createUserWithEmailAndPassword(auth, email, password);
         user = res.user;
         isNewUser = true;
+        await sendEmailVerification(user);
       } else {
         const res = await signInWithEmailAndPassword(auth, email, password);
         user = res.user;
       }
+      
       if (user) {
+        // Enforce Email Verification (skip in local dummy mode)
+        if (!user.emailVerified && !user.email?.endsWith('@local.host')) {
+          await signOut(auth);
+          if (isNewUser) {
+            setError('Account created! Please verify your email address to log in. We sent a link to your email.');
+          } else {
+            setError('Please verify your email address to log in.');
+          }
+          return;
+        }
+
         await syncUserDoc(user.uid, user.email!);
         if (isNewUser) {
           fetch('https://n8n.srv976794.hstgr.cloud/webhook/user-signup', {
@@ -63,6 +76,22 @@ const Login = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleResend = async () => {
+    if (!email || !password) return;
+    setLoading(true);
+    try {
+      const res = await signInWithEmailAndPassword(auth, email, password);
+      if (res.user && !res.user.emailVerified) {
+        await sendEmailVerification(res.user);
+        setError('Verification email resent. Please check your inbox.');
+        await signOut(auth);
+      }
+    } catch(e) {
+      setError('Error resending email. Please try logging in again to see options.');
+    }
+    setLoading(false);
   };
 
   return (
@@ -154,8 +183,13 @@ const Login = () => {
             </p>
 
             {error && (
-              <div style={{ padding: '1rem', background: '#fef2f2', color: '#ef4444', borderRadius: '12px', fontSize: '0.85rem', marginBottom: '1.5rem', fontWeight: 600, border: '1px solid #fee2e2' }}>
+              <div style={{ padding: '1rem', background: error.includes('resent') ? '#ecfdf5' : '#fef2f2', color: error.includes('resent') ? '#064e3b' : '#ef4444', borderRadius: '12px', fontSize: '0.85rem', marginBottom: '1.5rem', fontWeight: 600, border: error.includes('resent') ? '1px solid #d1fae5' : '1px solid #fee2e2' }}>
                 {error}
+                {error.includes('verify') && !error.includes('resent') && (
+                  <button type="button" onClick={handleResend} style={{ display: 'block', marginTop: '0.5rem', background: 'none', border: 'none', color: '#6366f1', fontWeight: 700, padding: 0, cursor: 'pointer', textDecoration: 'underline' }}>
+                    Resend Verification Email
+                  </button>
+                )}
               </div>
             )}
 

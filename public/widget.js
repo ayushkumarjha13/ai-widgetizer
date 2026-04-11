@@ -14,8 +14,12 @@
         const scripts = document.getElementsByTagName('script');
         for (let i = 0; i < scripts.length; i++) {
           if (scripts[i].src && scripts[i].src.includes('widget.js')) {
-            baseUrl = new URL(scripts[i].src).origin;
-            break;
+            try {
+              baseUrl = new URL(scripts[i].src).origin;
+              break;
+            } catch(e) {
+              // Ignore invalid URLs
+            }
           }
         }
       }

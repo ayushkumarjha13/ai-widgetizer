@@ -48,6 +48,13 @@
       sId = 'sess_' + Math.random().toString(36).substring(2, 15);
       localStorage.setItem('chat_session_' + c.widgetId, sId);
     }
+    
+    var hasTrackedOpen = false;
+    try {
+      if (sessionStorage.getItem('cw_opened_' + c.widgetId)) {
+        hasTrackedOpen = true;
+      }
+    } catch(e) {}
 
     var s = document.createElement('style');
     s.textContent = [
@@ -234,7 +241,15 @@
     document.getElementById('rc-cx').onclick = function(e) { e.stopPropagation(); win.classList.remove('o'); };
     document.getElementById('rc-go').onclick = function() { send(inp.value); };
     inp.onkeydown = function(e) { if (e.key === 'Enter') send(inp.value); };
-    if (c.autoOpen > 0) { setTimeout(function() { if (!win.classList.contains('o')) win.classList.add('o'); }, c.autoOpen * 1000); }
+    if (c.autoOpen && !hasTrackedOpen) { 
+      setTimeout(function() { 
+        if (!win.classList.contains('o')) {
+          win.classList.add('o'); 
+          hasTrackedOpen = true;
+          try { sessionStorage.setItem('cw_opened_' + c.widgetId, '1'); } catch(e){}
+        }
+      }, c.autoOpen * 1000); 
+    }
   };
   init();
 })();
