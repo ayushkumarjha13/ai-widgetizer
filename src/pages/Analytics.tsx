@@ -186,35 +186,12 @@ const Analytics = () => {
 
           {/* Controls Bar */}
           <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-            {/* View Switcher Button */}
-            {activeTab === 'overview' ? (
-              <button 
-                type="button"
-                className="btn"
-                onClick={() => setActiveTab('conversations')}
-                style={{ display: 'flex', alignItems: 'center', gap: '8px', background: '#6366f1', color: '#fff', border: 'none', padding: '8px 16px', borderRadius: '8px', cursor: 'pointer', fontWeight: 600 }}
-              >
-                <MessageSquare size={18} />
-                <span>View Chat History</span>
-              </button>
-            ) : (
-              <button 
-                type="button"
-                className="btn btn-outline"
-                onClick={() => setActiveTab('overview')}
-                style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 16px', borderRadius: '8px', cursor: 'pointer', fontWeight: 600 }}
-              >
-                <ArrowLeft size={18} />
-                <span>Back to Overview</span>
-              </button>
-            )}
-
             {/* Date Preset */}
             <select
               className="form-control"
               style={{ width: 'auto', minWidth: '130px' }}
               value={dateRange}
-              onChange={e => setDateRange(e.target.value as any)}
+              onChange={e => setDateRange(e.target.value as 'all' | 'today' | 'yesterday' | 'week' | 'month')}
             >
               <option value="all">All Time</option>
               <option value="today">Today</option>
@@ -240,6 +217,32 @@ const Analytics = () => {
               ))}
             </select>
           </div>
+        </div>
+
+        {/* Tab Navigation Menu */}
+        <div style={{ 
+            display: 'flex', gap: '8px', overflowX: 'auto', 
+            padding: '1rem 1.5rem', background: 'var(--surface-color)', 
+            borderBottom: '1px solid var(--border-color)',
+            scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch',
+            flexShrink: 0
+        }}>
+             <button 
+                onClick={() => setActiveTab('overview')}
+                className={`btn ${activeTab === 'overview' ? 'btn-primary' : 'btn-outline'}`} 
+                style={{ padding: '6px 16px', fontSize: '0.85rem', whiteSpace: 'nowrap', borderRadius: '100px' }}
+             >
+                <BarChart2 size={16} style={{ marginRight: '6px' }} />
+                Analytics Overview
+             </button>
+             <button 
+                onClick={() => setActiveTab('conversations')}
+                className={`btn ${activeTab === 'conversations' ? 'btn-primary' : 'btn-outline'}`}
+                style={{ padding: '6px 16px', fontSize: '0.85rem', whiteSpace: 'nowrap', borderRadius: '100px' }}
+             >
+                <MessageSquare size={16} style={{ marginRight: '6px' }} />
+                Chat History
+             </button>
         </div>
 
         <div style={{ padding: '2rem', display: 'flex', flexDirection: 'column', gap: '2rem', overflowY: 'auto', flex: 1 }}>
