@@ -4,6 +4,7 @@ import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Builder from './pages/Builder';
 import Analytics from './pages/Analytics';
+import ChatHistory from './pages/ChatHistory';
 import SaaSAnalytics from './pages/SaaSAnalytics';
 import { useAuthStore } from './store/authStore';
 import { onAuthStateChanged } from 'firebase/auth';
@@ -40,6 +41,7 @@ function App() {
         <Route path="/builder" element={<PrivateRoute><Builder /></PrivateRoute>} />
         <Route path="/builder/:widgetId" element={<PrivateRoute><Builder /></PrivateRoute>} />
         <Route path="/analytics" element={<PrivateRoute><Analytics /></PrivateRoute>} />
+        <Route path="/chat-history" element={<PrivateRoute><ChatHistory /></PrivateRoute>} />
         <Route path="/admin" element={<PrivateRoute><SaaSAnalytics /></PrivateRoute>} />
         <Route path="*" element={<Navigate to="/dashboard" />} />
       </Routes>

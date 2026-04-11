@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { 
   Mail, Lock, ArrowRight, 
-  BarChart3, Palette, Zap, Globe, Shield, MessageSquare,
+  BarChart3, Palette, Zap, MessageSquare,
   Star
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -91,95 +91,81 @@ const Login = () => {
   };
 
   return (
-    <div className="landing-page" style={{ background: '#f8fafc', minHeight: '100vh', color: '#0f172a', overflowX: 'hidden' }}>
+    <div className="landing-page" style={{ background: '#020617', minHeight: '100vh', color: '#f8fafc', overflowX: 'hidden', backgroundImage: 'radial-gradient(circle at top right, rgba(16, 185, 129, 0.05), transparent 40%), radial-gradient(circle at bottom left, rgba(239, 68, 68, 0.05), transparent 40%)' }}>
       
       {/* Navigation */}
-      <nav style={{ padding: '1.5rem 2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', maxWidth: '1200px', margin: '0 auto', position: 'sticky', top: 0, zIndex: 100, background: 'rgba(248, 250, 252, 0.8)', backdropFilter: 'blur(10px)' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 800, fontSize: '1.5rem', color: '#6366f1' }}>
-          <Zap fill="#6366f1" size={28} />
-          <span>ChatWatch</span>
+      <nav style={{ padding: '1.5rem 2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', maxWidth: '1200px', margin: '0 auto', position: 'sticky', top: 0, zIndex: 100, background: 'rgba(2, 6, 23, 0.6)', backdropFilter: 'blur(12px)', borderBottom: '1px solid rgba(255, 255, 255, 0.05)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 800, fontSize: '1.5rem', color: '#f8fafc', letterSpacing: '-0.02em' }}>
+          <Zap fill="#10b981" color="#10b981" size={28} />
+          <span>ChatWatch<span style={{ color: '#10b981' }}>.</span></span>
         </div>
-        <div style={{ display: 'flex', gap: '2rem', fontWeight: 600, fontSize: '0.9rem' }}>
-          <a href="#features" style={{ color: 'inherit', textDecoration: 'none' }}>Features</a>
-          <button onClick={() => setShowAuth(true)} style={{ background: 'none', border: 'none', fontWeight: 600, cursor: 'pointer', color: '#6366f1' }}>Login</button>
+        <div style={{ display: 'flex', gap: '2rem', fontWeight: 600, fontSize: '0.9rem', alignItems: 'center' }}>
+          <a href="#features" style={{ color: '#cbd5e1', textDecoration: 'none', transition: 'color 0.2s' }}>Features</a>
+          <button onClick={() => setShowAuth(true)} style={{ background: 'rgba(255, 255, 255, 0.1)', border: '1px solid rgba(255, 255, 255, 0.1)', color: '#fff', padding: '8px 20px', borderRadius: '100px', fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s' }}>Sign In</button>
         </div>
       </nav>
 
       {/* Hero Section */}
-      <section style={{ padding: 'clamp(3rem, 10vw, 6rem) 1.5rem', textAlign: 'center', maxWidth: '900px', margin: '0 auto' }}>
-        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '8px 20px', background: '#eef2ff', color: '#6366f1', borderRadius: '100px', fontSize: '0.85rem', fontWeight: 800, marginBottom: '2.5rem', border: '1px solid #c7d2fe' }}>
-          <Star size={16} fill="#6366f1" />
-          <span style={{ letterSpacing: '0.5px' }}>NOW POWERED BY SENTIMENT AI</span>
+      <section style={{ padding: 'clamp(5rem, 12vw, 8rem) 1.5rem', textAlign: 'center', maxWidth: '1000px', margin: '0 auto' }}>
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '8px 24px', background: 'rgba(16, 185, 129, 0.1)', color: '#10b981', borderRadius: '100px', fontSize: '0.85rem', fontWeight: 800, marginBottom: '2.5rem', border: '1px solid rgba(16, 185, 129, 0.3)', backdropFilter: 'blur(8px)' }}>
+          <Star size={16} fill="#10b981" />
+          <span style={{ letterSpacing: '0.5px' }}>SOLVING N8N'S BIGGEST BLINDSPOT</span>
         </div>
-        <h1 style={{ fontSize: 'clamp(3rem, 8vw, 4.5rem)', fontWeight: 900, lineHeight: 1.1, marginBottom: '1.5rem', letterSpacing: '-0.03em', color: '#0f172a' }}>
-          Turn your n8n workflows into <span style={{ color: '#6366f1' }}>Professional AI Chat Widgets</span>
+        <h1 style={{ fontSize: 'clamp(3rem, 8vw, 4.8rem)', fontWeight: 900, lineHeight: 1.05, marginBottom: '1.5rem', letterSpacing: '-0.03em', color: '#fff' }}>
+          Stop guessing. <span style={{ color: '#10b981', textShadow: '0 0 40px rgba(16, 185, 129, 0.4)' }}>See exactly</span> what your n8n bots are saying.
         </h1>
-        <p style={{ fontSize: 'clamp(1rem, 4vw, 1.25rem)', color: '#64748b', marginBottom: '2.5rem', lineHeight: 1.6 }}>
-          Complete custom branding, advanced analytics, and sentiment analysis for your n8n chatbots. Install in seconds with one line of code.
+        <p style={{ fontSize: 'clamp(1.1rem, 4vw, 1.35rem)', color: '#94a3b8', marginBottom: '3rem', lineHeight: 1.6, maxWidth: '800px', margin: '0 auto 3rem' }}>
+          Native n8n webhooks are a black box. ChatWatch gives you complete session-based transcripts, white-label branding without watermarks, and enterprise analytics for your n8n workflows.
         </p>
-        <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap', marginTop: '2rem' }}>
-          <button onClick={() => { setIsSignUp(true); setShowAuth(true); }} className="btn btn-primary" style={{ padding: '1.25rem 2.5rem', fontSize: '1.1rem', borderRadius: '100px', fontWeight: 800, boxShadow: '0 20px 25px -5px rgba(99, 102, 241, 0.3), 0 8px 10px -6px rgba(99, 102, 241, 0.4)', transition: 'transform 0.2s', ...({':hover': {transform: 'scale(1.05)'}} as any) }}>
-            Start Building for Free <ArrowRight size={20} />
+        <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap', marginTop: '1rem' }}>
+          <button onClick={() => { setIsSignUp(true); setShowAuth(true); }} className="btn" style={{ padding: '1.25rem 2.75rem', fontSize: '1.1rem', borderRadius: '100px', fontWeight: 800, background: '#10b981', color: '#020617', border: 'none', boxShadow: '0 20px 25px -5px rgba(16, 185, 129, 0.3)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            Build Your First Widget <ArrowRight size={20} />
           </button>
-          <button style={{ padding: '1.25rem 2.5rem', fontSize: '1.1rem', borderRadius: '100px', background: '#fff', border: '2px solid #e2e8f0', color: '#0f172a', fontWeight: 700, transition: 'transform 0.2s' }}>
-            Book a Demo
+          <button style={{ padding: '1.25rem 2.75rem', fontSize: '1.1rem', borderRadius: '100px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', fontWeight: 700, cursor: 'pointer', backdropFilter: 'blur(8px)' }}>
+            View Demo
           </button>
         </div>
 
         {/* Video Container placeholder */}
         <div style={{ 
-          width: '100%', maxWidth: '1000px', margin: '5rem auto 0',
-          aspectRatio: '16/9', background: '#f1f5f9', borderRadius: '24px',
-          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
-          overflow: 'hidden', position: 'relative', border: '1px solid #e2e8f0',
-          display: 'flex', alignItems: 'center', justifyContent: 'center'
+          width: '100%', maxWidth: '1000px', margin: '6rem auto 0',
+          aspectRatio: '16/9', background: 'rgba(15, 23, 42, 0.6)', borderRadius: '24px',
+          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
+          overflow: 'hidden', position: 'relative', border: '1px solid rgba(255,255,255,0.1)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          backdropFilter: 'blur(12px)'
         }}>
            <div style={{ color: '#94a3b8', textAlign: 'center', padding: '2rem' }}>
-              <div style={{ width: '64px', height: '64px', borderRadius: '50%', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1rem', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}>
-                 <div style={{ width: 0, height: 0, borderTop: '10px solid transparent', borderBottom: '10px solid transparent', borderLeft: '16px solid #6366f1', marginLeft: '4px' }}></div>
+              <div style={{ width: '80px', height: '80px', borderRadius: '50%', background: 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem', border: '1px solid rgba(255,255,255,0.2)', cursor: 'pointer' }}>
+                 <div style={{ width: 0, height: 0, borderTop: '12px solid transparent', borderBottom: '12px solid transparent', borderLeft: '20px solid #10b981', marginLeft: '6px' }}></div>
               </div>
-              <p style={{ fontWeight: 600, fontSize: '1.1rem' }}>Video Presentation Area</p>
-              <p style={{ fontSize: '0.9rem', opacity: 0.8 }}>Provide your video link to replace this placeholder</p>
+              <p style={{ fontWeight: 600, fontSize: '1.2rem', color: '#fff' }}>See the Platform in Action</p>
+              <p style={{ fontSize: '0.95rem', opacity: 0.8, marginTop: '0.5rem' }}>Provide your demo video link to embed here</p>
            </div>
         </div>
       </section>
 
       {/* Features Grid */}
-      <section id="features" style={{ padding: '4rem 2rem', maxWidth: '1100px', margin: '0 auto' }}>
+      <section id="features" style={{ padding: '6rem 2rem', maxWidth: '1100px', margin: '0 auto' }}>
         <div style={{ textAlign: 'center', marginBottom: '5rem' }}>
-          <h2 style={{ fontSize: 'clamp(2rem, 6vw, 3rem)', fontWeight: 900, marginBottom: '1.25rem', letterSpacing: '-0.02em' }}>Everything you need to ship</h2>
-          <p style={{ color: '#64748b', fontSize: '1.25rem', maxWidth: '600px', margin: '0 auto' }}>Native n8n widgets are limited. We give you full control over your chat experience.</p>
+          <h2 style={{ fontSize: 'clamp(2.5rem, 6vw, 3.5rem)', fontWeight: 900, marginBottom: '1.25rem', letterSpacing: '-0.02em', color: '#fff' }}>Built for the n8n Maker</h2>
+          <p style={{ color: '#94a3b8', fontSize: '1.25rem', maxWidth: '600px', margin: '0 auto' }}>Native n8n widgets are a black box. We give you full control, deep insights, and a premium enterprise look.</p>
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '2rem' }}>
           <FeatureCard 
-            icon={<Palette color="#6366f1" />}
-            title="Custom Branding"
-            desc="Remove all watermarks. Use your own logos, colors, and themes to match your brand perfectly."
+            icon={<MessageSquare color="#10b981" />}
+            title="Session Transcript Tracking"
+            desc="The missing feature for n8n. See exactly what your users and AI are saying with full session-based chat logs."
           />
           <FeatureCard 
-            icon={<BarChart3 color="#6366f1" />}
-            title="Advanced Analytics"
-            desc="Track every interaction. See unique visitors, message volume, and engagement rates in real-time."
+            icon={<Palette color="#10b981" />}
+            title="100% White-Labeled"
+            desc="No 'Powered by n8n' watermarks. Apply your own custom colors, fonts, and logos for a true enterprise feel."
           />
           <FeatureCard 
-            icon={<MessageSquare color="#6366f1" />}
-            title="Sentiment Analysis"
-            desc="Understand your users. Our AI analyzes message sentiment so you know when users are happy or frustrated."
-          />
-          <FeatureCard 
-            icon={<Shield color="#6366f1" />}
-            title="Lead Capture"
-            desc="Capture emails and names before starting a chat to build your pipeline automatically."
-          />
-          <FeatureCard 
-            icon={<Globe color="#6366f1" />}
-            title="Geo Tracking"
-            desc="Know where your customers are. Detailed geographical maps showing user distribution."
-          />
-          <FeatureCard 
-            icon={<Zap color="#6366f1" />}
-            title="One-Line Install"
-            desc="Works everywhere. Wordpress, Webflow, React, or plain HTML. Just paste a script and go."
+            icon={<BarChart3 color="#10b981" />}
+            title="SaaS-Grade Analytics"
+            desc="Stop guessing if your workflow is converting. Track unique visitors, message volume, and engagement metrics natively."
           />
         </div>
       </section>
@@ -289,12 +275,12 @@ const Login = () => {
 };
 
 const FeatureCard = ({ icon, title, desc }: { icon: React.ReactNode, title: string, desc: string }) => (
-  <div style={{ padding: '3rem 2.5rem', background: '#fff', borderRadius: '32px', border: '1px solid #f1f5f9', transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)', cursor: 'default' }} className="hover-lift">
-    <div style={{ width: '56px', height: '56px', background: '#eef2ff', borderRadius: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '2rem' }}>
+  <div style={{ padding: '3rem 2.5rem', background: 'rgba(15, 23, 42, 0.4)', borderRadius: '32px', border: '1px solid rgba(255,255,255,0.05)', transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)', cursor: 'default', backdropFilter: 'blur(10px)' }}>
+    <div style={{ width: '64px', height: '64px', background: 'rgba(16, 185, 129, 0.1)', borderRadius: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '2rem', border: '1px solid rgba(16, 185, 129, 0.2)' }}>
       {icon}
     </div>
-    <h3 style={{ fontSize: '1.5rem', fontWeight: 800, marginBottom: '1rem', color: '#0f172a' }}>{title}</h3>
-    <p style={{ color: '#64748b', fontSize: '1.05rem', lineHeight: 1.6 }}>{desc}</p>
+    <h3 style={{ fontSize: '1.5rem', fontWeight: 800, marginBottom: '1rem', color: '#fff' }}>{title}</h3>
+    <p style={{ color: '#94a3b8', fontSize: '1.05rem', lineHeight: 1.6 }}>{desc}</p>
   </div>
 );
 
