@@ -1,5 +1,5 @@
-﻿const { query } = require('../db');
-const { authenticateToken } = require('../auth');
+const { query } = require('../db.cjs');
+const { authenticateToken } = require('../auth.cjs');
 
 module.exports = async (req, res) => {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });

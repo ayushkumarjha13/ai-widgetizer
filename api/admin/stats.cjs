@@ -1,5 +1,5 @@
-﻿const { query } = require('../db');
-const { authenticateToken } = require('../auth');
+const { query } = require('../db.cjs');
+const { authenticateToken } = require('../auth.cjs');
 
 module.exports = async (req, res) => {
   authenticateToken(req, res, async () => {
