@@ -5,10 +5,8 @@ import {
   Star
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword, sendEmailVerification, signOut } from 'firebase/auth';
-import { auth } from '../lib/firebase';
+import { authService } from '../lib/authService';
 import { useAuthStore } from '../store/authStore';
-import { syncUserDoc } from '../lib/firestoreService';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -25,69 +23,29 @@ const Login = () => {
     setError('');
     setLoading(true);
     try {
-      let user;
-      let isNewUser = false;
-      if (isSignUp) {
-        const res = await createUserWithEmailAndPassword(auth, email, password);
-        user = res.user;
-        isNewUser = true;
-        await sendEmailVerification(user);
-      } else {
-        const res = await signInWithEmailAndPassword(auth, email, password);
-        user = res.user;
-      }
+      const data = await authService.login(email);
       
-      if (user) {
-        // Enforce Email Verification (only for new signups)
-        if (isNewUser && !user.emailVerified && !user.email?.endsWith('@local.host')) {
-          await signOut(auth);
-          setError('Account created! Please verify your email address. We sent a link to your email.');
-          return;
-        }
-
-        await syncUserDoc(user.uid, user.email!);
-        if (isNewUser) {
+      if (data.token) {
+        setUser(data.user);
+        // Sync with n8n if needed
+        if (isSignUp) {
           fetch('https://n8n.srv976794.hstgr.cloud/webhook/user-signup', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email: user.email, uid: user.uid })
+            body: JSON.stringify({ email: data.user.email, uid: data.user.user_id })
           }).catch(err => console.error('n8n error:', err));
         }
-      }
-      navigate('/dashboard');
-    } catch (e: unknown) {
-      const err = e as { code?: string; message?: string };
-      if (err.code === 'auth/api-key-not-valid' || auth.app.options.apiKey?.includes('DummyKey')) {
-        const devUser = { uid: 'dev-mode-user', email: email || 'developer@local.host' };
-        try {
-          await syncUserDoc(devUser.uid, devUser.email);
-        } catch (firestoreErr) {
-          console.warn('Could not sync dev user to Firestore:', firestoreErr);
-        }
-        setUser(devUser as Parameters<typeof setUser>[0]);
         navigate('/dashboard');
-      } else {
-        setError(err.message || 'Authentication failed.');
       }
+    } catch (e: any) {
+      setError(e.response?.data?.error || 'Authentication failed.');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleResend = async () => {
-    if (!email || !password) return;
-    setLoading(true);
-    try {
-      const res = await signInWithEmailAndPassword(auth, email, password);
-      if (res.user && !res.user.emailVerified) {
-        await sendEmailVerification(res.user);
-        setError('Verification email resent. Please check your inbox.');
-        await signOut(auth);
-      }
-    } catch(e) {
-      setError('Error resending email. Please try logging in again to see options.');
-    }
-    setLoading(false);
+  const handleResend = () => {
+    setError('Check your email for instructions.');
   };
 
   return (

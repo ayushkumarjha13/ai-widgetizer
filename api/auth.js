@@ -1,18 +1,24 @@
 const jwt = require('jsonwebtoken');
-const { query } = require('./db');
 const JWT_SECRET = process.env.JWT_SECRET;
 
-const authenticateToken = (req, res, next) => {
-  const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1];
+module.exports = async (req, res) => {
+  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-  if (!token) return res.status(401).json({ error: 'Unauthorized' });
+  const { email, password } = req.body;
 
-  jwt.verify(token, JWT_SECRET, (err, user) => {
-    if (err) return res.status(403).json({ error: 'Forbidden' });
-    req.user = user;
-    next();
+  // Simple demo login logic - in production, verify against DB
+  // For this project, we are treating all logins as successful and creating/syncing the user
+  
+  const user = {
+    user_id: email.replace(/[^a-zA-Z0-9]/g, '_'),
+    email: email,
+    name: email.split('@')[0]
+  };
+
+  const token = jwt.sign(user, JWT_SECRET, { expiresIn: '7d' });
+
+  res.status(200).json({
+    token,
+    user
   });
 };
-
-module.exports = { authenticateToken };

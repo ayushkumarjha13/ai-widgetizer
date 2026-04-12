@@ -12,7 +12,7 @@ module.exports = async (req, res) => {
       if (widget_id) { q += ' AND widget_id = '; params.push(widget_id); }
       q += ' GROUP BY session_id ORDER BY last_activity DESC';
       const result = await query(q, params);
-      res.status(200).json(result.rows);
+      res.status(200).json(result.rows || []);
     } catch (error) { res.status(500).json({ error: 'Internal server error' }); }
   });
 };

@@ -8,7 +8,7 @@ module.exports = async (req, res) => {
       const { user_id } = req.user;
       const { session_id } = req.query;
       const result = await query('SELECT * FROM messages WHERE owner_uid =  AND session_id =  ORDER BY ts ASC', [user_id, session_id]);
-      res.status(200).json(result.rows);
+      res.status(200).json(result.rows || []);
     } catch (error) { res.status(500).json({ error: 'Internal server error' }); }
   });
 };

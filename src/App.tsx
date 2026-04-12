@@ -7,8 +7,7 @@ import Analytics from './pages/Analytics';
 import ChatHistory from './pages/ChatHistory';
 import SaaSAnalytics from './pages/SaaSAnalytics';
 import { useAuthStore } from './store/authStore';
-import { onAuthStateChanged } from 'firebase/auth';
-import { auth } from './lib/firebase';
+import { authService } from './lib/authService';
 
 const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
   const { user, loading } = useAuthStore();
@@ -25,11 +24,17 @@ function App() {
   const { setUser, setLoading } = useAuthStore();
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setUser(user);
-      setLoading(false);
-    });
-    return () => unsubscribe();
+    async function initAuth() {
+      try {
+        const user = await authService.checkStatus();
+        setUser(user);
+      } catch (error) {
+        setUser(null);
+      } finally {
+        setLoading(false);
+      }
+    }
+    initAuth();
   }, [setUser, setLoading]);
 
   return (
