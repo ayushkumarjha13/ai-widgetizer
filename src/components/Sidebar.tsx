@@ -30,7 +30,7 @@ const Sidebar = ({ mobileOpen = false, onMobileClose }: SidebarProps) => {
   ];
 
   const ownerEmail = 'ayushjha.in@gmail.com';
-  const isOwner = user?.email === ownerEmail || user?.uid.startsWith('dev-mode');
+  const isOwner = user?.email === ownerEmail || (user?.user_id && String(user.user_id).startsWith('dev-mode'));
 
   if (isOwner) {
     menu.push({ label: 'Owner Dashboard', icon: <ShieldCheck size={20} />, path: '/admin' });
