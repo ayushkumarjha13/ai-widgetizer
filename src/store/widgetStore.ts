@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { saveUserWidget, deleteUserWidget, fetchUserWidgets } from '../lib/firestoreService';
+import { apiService } from '../lib/apiService';
 
 export interface WidgetConfig {
   id?: string;
@@ -38,14 +38,6 @@ export const defaultWidget: WidgetConfig = {
   autoOpen: false,
 };
 
-/** Wraps a promise with a timeout — prevents Firestore hangs from freezing the UI */
-const withTimeout = <T>(promise: Promise<T>, ms = 15000, label = 'Operation'): Promise<T> => {
-  const timeout = new Promise<never>((_, reject) =>
-    setTimeout(() => reject(new Error(`${label} timed out. Check your Firestore/network setup.`)), ms)
-  );
-  return Promise.race([promise, timeout]);
-};
-
 interface WidgetState {
   config: WidgetConfig;
   savedWidgets: WidgetConfig[];
@@ -72,10 +64,10 @@ export const useWidgetStore = create<WidgetState>((set, get) => ({
   loadWidgets: async (uid: string) => {
     set({ loading: true, loadError: null });
     try {
-      const widgets = await withTimeout(fetchUserWidgets(uid), 15000, 'Load widgets');
+      const widgets = await apiService.getWidgets(uid);
       set({ savedWidgets: widgets, loading: false });
     } catch (e: any) {
-      console.error('[Firestore] loadWidgets failed:', e.message);
+      console.error('[API] loadWidgets failed:', e.message);
       set({ loading: false, loadError: e.message || 'Failed to load widgets.' });
     }
   },
@@ -83,17 +75,16 @@ export const useWidgetStore = create<WidgetState>((set, get) => ({
   saveWidget: async (config: WidgetConfig, uid: string) => {
     set({ saving: true, saveError: null });
     try {
-      await withTimeout(saveUserWidget(uid, { ...config, ownerUid: uid }), 15000, 'Save widget');
-      const existing = get().savedWidgets.findIndex(w => w.id === config.id);
-      let newWidgets = [...get().savedWidgets];
-      if (existing >= 0) {
-        newWidgets[existing] = config;
+      if (config.id && get().savedWidgets.some(w => w.id === config.id)) {
+        await apiService.updateWidget(config.id, config);
       } else {
-        newWidgets = [config, ...newWidgets];
+        await apiService.createWidget(config);
       }
-      set({ savedWidgets: newWidgets, saving: false });
+      
+      const widgets = await apiService.getWidgets(uid);
+      set({ savedWidgets: widgets, saving: false });
     } catch (e: any) {
-      console.error('[Firestore] saveWidget failed:', e.message);
+      console.error('[API] saveWidget failed:', e.message);
       set({ saving: false, saveError: e.message || 'Failed to save widget.' });
       throw e;
     }
@@ -101,10 +92,10 @@ export const useWidgetStore = create<WidgetState>((set, get) => ({
 
   deleteWidget: async (id: string) => {
     try {
-      await withTimeout(deleteUserWidget(id), 15000, 'Delete widget');
+      await apiService.deleteWidget(id);
       set(state => ({ savedWidgets: state.savedWidgets.filter(w => w.id !== id) }));
     } catch (e: any) {
-      console.error('[Firestore] deleteWidget failed:', e.message);
+      console.error('[API] deleteWidget failed:', e.message);
       throw e;
     }
   },

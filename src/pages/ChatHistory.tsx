@@ -5,11 +5,8 @@ import { useWidgetStore } from '../store/widgetStore';
 import { 
   MessageSquare, ArrowLeft, Bot, Users, MessageCircle
 } from 'lucide-react';
-import { 
-  fetchConversationsForWidget, 
-  fetchSessionMessages,
-} from '../lib/firestoreService';
-import type { WidgetEvent } from '../lib/firestoreService';
+import { apiService } from '../lib/apiService';
+import type { WidgetEvent } from '../lib/apiService';
 
 const COUNTRIES_EMOJI: Record<string, string> = {
   'United States': '🇺🇸', 'India': '🇮🇳', 'United Kingdom': '🇬🇧',
@@ -63,7 +60,7 @@ const ChatHistory = () => {
 
   useEffect(() => {
     if (user) {
-      loadWidgets(user.uid).then(() => {});
+      loadWidgets(user.user_id).then(() => {});
     }
   }, [user, loadWidgets]);
 
@@ -71,7 +68,7 @@ const ChatHistory = () => {
   useEffect(() => {
     if (selectedWidgetId !== 'all') {
       setLoadingSessions(true);
-      fetchConversationsForWidget(selectedWidgetId, resolvedRange.start, resolvedRange.end)
+      apiService.getConversations(selectedWidgetId, resolvedRange.start, resolvedRange.end)
         .then(setSessions)
         .catch(console.error)
         .finally(() => setLoadingSessions(false));
@@ -84,7 +81,7 @@ const ChatHistory = () => {
   useEffect(() => {
     if (selectedSessionId) {
       setLoadingMessages(true);
-      fetchSessionMessages(selectedSessionId)
+      apiService.getSessionMessages(selectedSessionId)
         .then(setMessages)
         .catch(console.error)
         .finally(() => setLoadingMessages(false));
@@ -214,24 +211,24 @@ const ChatHistory = () => {
                         </div>
                       ) : (
                         messages.map((m, i) => (
-                          <div key={i} style={{ display: 'flex', justifyContent: m.sender === 'user' ? 'flex-end' : 'flex-start' }}>
+                          <div key={i} style={{ display: 'flex', justifyContent: m.role === 'user' ? 'flex-end' : 'flex-start' }}>
                             <div style={{ 
                               maxWidth: '80%', 
                               padding: '10px 14px', 
                               borderRadius: '12px',
-                              background: m.sender === 'user' ? 'var(--primary-color)' : '#fff',
-                              color: m.sender === 'user' ? '#fff' : 'inherit',
-                              border: m.sender === 'bot' ? '1px solid var(--border-color)' : 'none',
+                              background: m.role === 'user' ? 'var(--primary-color)' : '#fff',
+                              color: m.role === 'user' ? '#fff' : 'inherit',
+                              border: m.role === 'assistant' ? '1px solid var(--border-color)' : 'none',
                               fontSize: '0.9rem',
                               boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
                             }}>
                               <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px', opacity: 0.8, fontSize: '0.7rem' }}>
-                                {m.sender === 'bot' ? <Bot size={12} /> : <Users size={12} />}
-                                <span>{m.sender === 'bot' ? 'AI Assistant' : 'Visitor'}</span>
+                                {m.role === 'assistant' ? <Bot size={12} /> : <Users size={12} />}
+                                <span>{m.role === 'assistant' ? 'AI Assistant' : 'Visitor'}</span>
                                 <span>•</span>
-                                <span>{m.ts?.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                                <span>{m.created_at ? new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}</span>
                               </div>
-                              <div style={{ whiteSpace: 'pre-wrap' }}>{m.text}</div>
+                              <div style={{ whiteSpace: 'pre-wrap' }}>{m.content}</div>
                             </div>
                           </div>
                         ))

@@ -40,12 +40,12 @@ const Builder = () => {
   const handleSave = async () => {
     if (!user) return;
     try {
-      await saveWidget(config, user.uid);
+      await saveWidget(config, user.user_id);
       setSaved(true);
       setActiveTab('embed');
       setTimeout(() => setSaved(false), 3000);
     } catch {
-      alert('Failed to save. Please check your Firebase configuration.');
+      alert('Failed to save. Please check your database connection.');
     }
   };
 

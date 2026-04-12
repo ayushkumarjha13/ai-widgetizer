@@ -14,7 +14,7 @@ const Dashboard = () => {
   useEffect(() => {
     resetConfig();
     if (user) {
-      loadWidgets(user.uid);
+      loadWidgets(user.user_id);
     }
   }, [resetConfig, user, loadWidgets]);
 
@@ -53,9 +53,9 @@ const Dashboard = () => {
             <div style={{ padding: '1.25rem 1.5rem', background: '#fef2f2', border: '1px solid #f87171', borderRadius: '12px', color: '#b91c1c', maxWidth: '480px', textAlign: 'center' }}>
               <h4 style={{ margin: '0 0 0.5rem', color: '#b91c1c' }}>⚠️ Could not load widgets</h4>
               <p style={{ margin: '0 0 1rem', fontSize: '0.875rem', color: '#dc2626' }}>{loadError}</p>
-              <p style={{ margin: 0, fontSize: '0.8rem', color: '#6b7280' }}>Make sure Firestore is enabled in your Firebase Console and the security rules are published.</p>
+              <p style={{ margin: 0, fontSize: '0.8rem', color: '#6b7280' }}>Make sure your PostgreSQL database is connected and environment variables are set in Vercel.</p>
             </div>
-            <button className="btn btn-outline" onClick={() => user && loadWidgets(user.uid)}>Retry</button>
+            <button className="btn btn-outline" onClick={() => user && loadWidgets(user.user_id)}>Retry</button>
           </div>
         ) : savedWidgets.length > 0 ? (
           <div className="widgets-grid">

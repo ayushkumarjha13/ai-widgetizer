@@ -1,7 +1,7 @@
 import { useEffect, useState, useMemo } from 'react';
 import Sidebar from '../components/Sidebar';
 import { useAuthStore } from '../store/authStore';
-import { fetchSaaSStats } from '../lib/firestoreService';
+import { apiService } from '../lib/apiService';
 import { 
   Users, 
   TrendingUp, Zap, Star, ShieldCheck,
@@ -19,17 +19,17 @@ const SaaSAnalytics = () => {
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
 
   // Security: Only owner can see this.
-  const ownerEmail = 'ayushjha.in@gmail.com'; 
-  const isOwner = user?.email === ownerEmail || user?.uid.startsWith('dev-mode');
+  const ownerEmail = 'ayushkumarjha13@gmail.com'; 
+  const isOwner = user?.email === ownerEmail || user?.user_id?.startsWith('dev-mode');
 
   useEffect(() => {
     if (!isOwner) return;
     setLoading(true);
-    fetchSaaSStats()
+    apiService.getAdminStats()
       .then(setStats)
-      .catch((err) => {
+      .catch((err: any) => {
         console.error(err);
-        setError(err.message || 'Failed to connect to platform data. Check Firebase permissions.');
+        setError(err.message || 'Failed to connect to platform data. Check database permissions.');
       })
       .finally(() => setLoading(false));
   }, [isOwner]);

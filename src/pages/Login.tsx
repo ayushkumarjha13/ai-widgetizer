@@ -43,9 +43,7 @@ const Login = () => {
     }
   };
 
-  const handleResend = () => {
-    setError('Check your email for instructions.');
-  };
+
 
   return (
     <div className="landing-page" style={{ 

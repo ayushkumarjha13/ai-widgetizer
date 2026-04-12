@@ -6,10 +6,8 @@ import {
   BarChart2, Users, Globe, Clock, MessageSquare,
   TrendingUp, Smile, Meh, Frown, Download
 } from 'lucide-react';
-import { 
-  fetchAnalyticsForUser 
-} from '../lib/firestoreService';
-import type { AnalyticsSummary } from '../lib/firestoreService';
+import { apiService } from '../lib/apiService';
+import type { AnalyticsSummary } from '../lib/apiService';
 
 type AllAnalytics = Record<string, AnalyticsSummary>;
 
@@ -62,14 +60,14 @@ const Analytics = () => {
 
   useEffect(() => {
     if (user) {
-      loadWidgets(user.uid).then(() => {});
+      loadWidgets(user.user_id).then(() => {});
     }
   }, [user, loadWidgets]);
 
   useEffect(() => {
     if (!user) return;
     setLoadingAnalytics(true);
-    fetchAnalyticsForUser(user.uid, resolvedRange.start, resolvedRange.end)
+    apiService.getAnalytics(user.user_id, resolvedRange.start, resolvedRange.end)
       .then(setAnalytics)
       .catch(console.error)
       .finally(() => setLoadingAnalytics(false));

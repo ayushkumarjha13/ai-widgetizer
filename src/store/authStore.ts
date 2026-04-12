@@ -1,14 +1,19 @@
 import { create } from 'zustand';
-import type { User } from 'firebase/auth';
-import { signOut } from 'firebase/auth';
-import { auth } from '../lib/firebase';
+import { authService } from '../lib/authService';
+
+export interface ApiUser {
+  user_id: string;
+  email: string;
+  name?: string;
+  display_name?: string;
+}
 
 interface AuthState {
-  user: User | null;
+  user: ApiUser | null;
   loading: boolean;
-  setUser: (user: User | null) => void;
+  setUser: (user: ApiUser | null) => void;
   setLoading: (loading: boolean) => void;
-  logout: () => Promise<void>;
+  logout: () => void;
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
@@ -16,12 +21,8 @@ export const useAuthStore = create<AuthState>((set) => ({
   loading: true,
   setUser: (user) => set({ user }),
   setLoading: (loading) => set({ loading }),
-  logout: async () => {
-    try {
-      await signOut(auth);
-    } catch (e) {
-      console.error('Logout failed', e);
-    }
+  logout: () => {
+    authService.logout();
     set({ user: null });
   },
 }));
